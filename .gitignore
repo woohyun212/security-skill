@@ -50,3 +50,4 @@ reports/
 # Claude Code / OMC
 .omc/
 .claude/
+.research/

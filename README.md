@@ -19,9 +19,9 @@ security-skill/
 └── packages/              # Executable packages for skill dependencies (future)
 ```
 
-## Skill List
+## Skill List (49 skills)
 
-### Recon
+### Recon (8)
 | Skill | Description |
 |-------|-------------|
 | [`subdomain-enum`](subdomain-enum/) | Subdomain enumeration (subfinder, amass) |
@@ -30,42 +30,77 @@ security-skill/
 | [`port-scan`](port-scan/) | Port scanning and service detection (nmap) |
 | [`cert-transparency`](cert-transparency/) | Certificate Transparency log lookup |
 | [`osint-email`](osint-email/) | Email address-based OSINT collection |
+| [`subdomain-takeover`](subdomain-takeover/) | Subdomain takeover detection for dangling DNS records |
+| [`cloud-pentest`](cloud-pentest/) | Cloud security testing for AWS, Azure, and GCP |
 
-### Vulnerability Analysis
+### Vulnerability Analysis (5)
 | Skill | Description |
 |-------|-------------|
 | [`cve-lookup`](cve-lookup/) | CVE detailed information lookup (NVD/MITRE) |
 | [`nuclei-scan`](nuclei-scan/) | Nuclei template-based vulnerability scanning |
 | [`dependency-audit`](dependency-audit/) | Dependency vulnerability audit (npm audit, pip-audit, trivy) |
 | [`secret-scan`](secret-scan/) | Secret/credential detection in source code |
+| [`supply-chain-audit`](supply-chain-audit/) | Software supply chain security with SLSA compliance and SBOM |
 
-### Web Security
+### Web Security (16)
 | Skill | Description |
 |-------|-------------|
 | [`security-headers`](security-headers/) | HTTP security header analysis |
 | [`ssl-check`](ssl-check/) | SSL/TLS certificate and configuration check |
 | [`cors-check`](cors-check/) | CORS misconfiguration detection |
 | [`waf-detect`](waf-detect/) | Web Application Firewall (WAF) detection |
+| [`mobile-pentest`](mobile-pentest/) | Mobile application security testing (Android/iOS) |
+| [`bug-bounty-methodology`](bug-bounty-methodology/) | Bug bounty hunting methodology and workflow |
+| [`web-vuln-idor`](web-vuln-idor/) | IDOR vulnerability detection (V1-V8 variants) |
+| [`web-vuln-ssrf`](web-vuln-ssrf/) | SSRF detection with IP bypass and cloud metadata exploitation |
+| [`web-vuln-business-logic`](web-vuln-business-logic/) | Business logic vulnerability detection |
+| [`web-vuln-race-conditions`](web-vuln-race-conditions/) | Race condition detection (TOCTOU, double-spend) |
+| [`web-vuln-oauth`](web-vuln-oauth/) | OAuth 2.0/OIDC vulnerability detection |
+| [`web-vuln-graphql`](web-vuln-graphql/) | GraphQL API security testing |
+| [`web-vuln-http-smuggling`](web-vuln-http-smuggling/) | HTTP request smuggling (CL.TE, TE.CL, H2.CL) |
+| [`web-vuln-cache-poisoning`](web-vuln-cache-poisoning/) | Web cache poisoning and cache deception |
+| [`web-vuln-ssti`](web-vuln-ssti/) | Server-Side Template Injection detection |
+| [`llm-ai-security`](llm-ai-security/) | LLM/AI security testing (OWASP ASI01-ASI10) |
 
-### Cryptography
+### Authentication & Session (3)
+| Skill | Description |
+|-------|-------------|
+| [`web-vuln-saml-sso`](web-vuln-saml-sso/) | SAML/SSO vulnerability detection (XSW attacks) |
+| [`web-vuln-mfa-bypass`](web-vuln-mfa-bypass/) | Multi-factor authentication bypass techniques |
+| [`ad-pentest`](ad-pentest/) | Active Directory penetration testing |
+
+### Cryptography (3)
 | Skill | Description |
 |-------|-------------|
 | [`hash-identify`](hash-identify/) | Hash type identification and verification |
 | [`encoding-toolkit`](encoding-toolkit/) | Encoding/decoding conversion (Base64, URL, Hex, etc.) |
 | [`cert-parse`](cert-parse/) | X.509 certificate parsing and chain validation |
 
-### Incident Response
+### Incident Response (5)
 | Skill | Description |
 |-------|-------------|
 | [`ioc-extract`](ioc-extract/) | IOC (Indicator of Compromise) extraction from text |
 | [`malware-hash`](malware-hash/) | Malware hash reputation lookup (VirusTotal) |
 | [`log-analysis`](log-analysis/) | Security log analysis and anomaly detection |
+| [`malware-analysis`](malware-analysis/) | Malware analysis pipeline (static + dynamic + behavioral) |
+| [`siem-rule`](siem-rule/) | SIEM detection rule engineering (Sigma, Splunk, Elastic, Sentinel) |
 
-### Compliance
+### Compliance & Reporting (5)
 | Skill | Description |
 |-------|-------------|
 | [`owasp-check`](owasp-check/) | OWASP Top 10 checklist-based assessment |
 | [`isms-checklist`](isms-checklist/) | ISMS-P certification item checklist |
+| [`threat-model`](threat-model/) | Threat modeling (STRIDE, DREAD, PASTA, Attack Trees) |
+| [`pentest-report`](pentest-report/) | Professional penetration test report writing |
+| [`bug-bounty-validation`](bug-bounty-validation/) | Bug bounty finding validation (7-Question Gate) |
+
+### Code Security (4)
+| Skill | Description |
+|-------|-------------|
+| [`secure-code-review`](secure-code-review/) | Security code review with 10-domain checklist |
+| [`devsecops-pipeline`](devsecops-pipeline/) | CI/CD security pipeline (SAST, SCA, DAST, SBOM) |
+| [`web3-smart-contract`](web3-smart-contract/) | Smart contract audit (10 DeFi vulnerability classes) |
+| [`exploit-chain-building`](exploit-chain-building/) | A-to-B-to-C exploit chain building methodology |
 
 ## Installation
 
@@ -91,6 +126,12 @@ To contribute a new skill, see [docs/contributing.md](docs/contributing.md).
 # Validate skills
 ./scripts/validate-skills.sh
 ```
+
+## Credits
+
+Skills inspired by and adapted from:
+- [JoasASantos/ClaudeAdvancedPlugins](https://github.com/JoasASantos/ClaudeAdvancedPlugins) — Offensive/defensive security plugins
+- [shuvonsec/claude-bug-bounty](https://github.com/shuvonsec/claude-bug-bounty) — Bug bounty hunting methodology
 
 ## License
 
