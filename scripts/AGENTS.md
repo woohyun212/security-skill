@@ -4,21 +4,21 @@
 # scripts
 
 ## Purpose
-스킬 유효성 검증 및 CI용 유틸리티 스크립트 모음.
+A collection of utility scripts for skill validation and CI.
 
 ## Key Files
 
 | File | Description |
 |------|-------------|
-| `validate-skills.sh` | 모든 스킬 디렉토리의 SKILL.md 구조 검증 (프론트매터, name 일치 등) |
-| `skill-docs.test.js` | SKILL.md 문서 컨벤션 테스트 (필수 섹션, 카테고리 유효성) |
+| `validate-skills.sh` | Validates the SKILL.md structure in all skill directories (frontmatter, name match, etc.) |
+| `skill-docs.test.js` | Tests SKILL.md documentation conventions (required sections, category validity) |
 
 ## For AI Agents
 
 ### Working In This Directory
-- `validate-skills.sh`는 루트에서 모든 스킬 디렉토리를 순회하며 검증
-- `skill-docs.test.js`는 `node scripts/skill-docs.test.js`로 실행
-- 새 검증 규칙 추가 시 두 파일 모두 업데이트 필요
+- `validate-skills.sh` iterates over all skill directories from the root and validates them
+- `skill-docs.test.js` is executed with `node scripts/skill-docs.test.js`
+- When adding new validation rules, both files must be updated
 
 ### Testing Requirements
 ```bash
@@ -29,7 +29,7 @@ node scripts/skill-docs.test.js
 ## Dependencies
 
 ### Internal
-- 루트의 모든 스킬 디렉토리 (`*/SKILL.md`)
+- All skill directories at the root (`*/SKILL.md`)
 
 ### External
 - bash (validate-skills.sh)

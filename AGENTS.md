@@ -3,99 +3,99 @@
 # security-skill
 
 ## Purpose
-AI 에이전트용 보안 스킬 모음집. 각 스킬은 `SKILL.md` 마크다운 지시서로, 에이전트가 검증된 보안 도구를 활용하여 정찰, 취약점 분석, 웹 보안 점검, 암호학, 침해 대응, 컴플라이언스 업무를 수행하도록 안내한다.
+A collection of security skills for AI agents. Each skill is a `SKILL.md` markdown instruction file that guides agents to perform reconnaissance, vulnerability analysis, web security checks, cryptography, incident response, and compliance tasks using proven security tools.
 
 ## Key Files
 
 | File | Description |
 |------|-------------|
-| `package.json` | 프로젝트 메타데이터 및 워크스페이스 설정 |
-| `CLAUDE.md` | Claude Code 개발 규칙 |
-| `README.md` | 프로젝트 소개 및 스킬 목록 |
-| `LICENSE` | MIT 라이선스 |
-| `.gitignore` | Git 제외 패턴 |
+| `package.json` | Project metadata and workspace configuration |
+| `CLAUDE.md` | Claude Code development rules |
+| `README.md` | Project introduction and skill list |
+| `LICENSE` | MIT license |
+| `.gitignore` | Git exclusion patterns |
 
 ## Subdirectories
 
-### Skills (스킬 디렉토리)
+### Skills
 
-#### Recon (정찰)
+#### Recon
 | Directory | Purpose |
 |-----------|---------|
-| `subdomain-enum/` | 서브도메인 열거 — subfinder, amass |
-| `dns-recon/` | DNS 레코드 정찰 및 zone transfer |
-| `whois-lookup/` | 도메인/IP WHOIS 조회 |
-| `port-scan/` | 포트 스캔 및 서비스 탐지 — nmap |
-| `cert-transparency/` | Certificate Transparency 로그 조회 |
-| `osint-email/` | 이메일 기반 OSINT 수집 |
+| `subdomain-enum/` | Subdomain enumeration — subfinder, amass |
+| `dns-recon/` | DNS record reconnaissance and zone transfer |
+| `whois-lookup/` | Domain/IP WHOIS lookup |
+| `port-scan/` | Port scanning and service detection — nmap |
+| `cert-transparency/` | Certificate Transparency log lookup |
+| `osint-email/` | Email-based OSINT collection |
 
-#### Vulnerability Analysis (취약점 분석)
+#### Vulnerability Analysis
 | Directory | Purpose |
 |-----------|---------|
-| `cve-lookup/` | CVE 상세 정보 조회 — NVD API |
-| `nuclei-scan/` | Nuclei 템플릿 기반 취약점 스캔 |
-| `dependency-audit/` | 의존성 취약점 감사 — npm audit, pip-audit, trivy |
-| `secret-scan/` | 소스코드 시크릿 탐지 — trufflehog, gitleaks |
+| `cve-lookup/` | CVE detail lookup — NVD API |
+| `nuclei-scan/` | Nuclei template-based vulnerability scanning |
+| `dependency-audit/` | Dependency vulnerability audit — npm audit, pip-audit, trivy |
+| `secret-scan/` | Source code secret detection — trufflehog, gitleaks |
 
-#### Web Security (웹 보안)
+#### Web Security
 | Directory | Purpose |
 |-----------|---------|
-| `security-headers/` | HTTP 보안 헤더 분석 |
-| `ssl-check/` | SSL/TLS 인증서 및 설정 점검 |
-| `cors-check/` | CORS 설정 오류 탐지 |
-| `waf-detect/` | WAF 탐지 |
+| `security-headers/` | HTTP security header analysis |
+| `ssl-check/` | SSL/TLS certificate and configuration check |
+| `cors-check/` | CORS misconfiguration detection |
+| `waf-detect/` | WAF detection |
 
-#### Cryptography (암호학)
+#### Cryptography
 | Directory | Purpose |
 |-----------|---------|
-| `hash-identify/` | 해시 타입 식별 및 검증 |
-| `encoding-toolkit/` | 인코딩/디코딩 변환 |
-| `cert-parse/` | X.509 인증서 파싱 및 체인 검증 |
+| `hash-identify/` | Hash type identification and verification |
+| `encoding-toolkit/` | Encoding/decoding conversion |
+| `cert-parse/` | X.509 certificate parsing and chain verification |
 
-#### Incident Response (침해 대응)
+#### Incident Response
 | Directory | Purpose |
 |-----------|---------|
-| `ioc-extract/` | IOC(침해 지표) 추출 |
-| `malware-hash/` | 악성코드 해시 평판 조회 — VirusTotal |
-| `log-analysis/` | 보안 로그 분석 및 이상 탐지 |
+| `ioc-extract/` | IOC (Indicator of Compromise) extraction |
+| `malware-hash/` | Malware hash reputation lookup — VirusTotal |
+| `log-analysis/` | Security log analysis and anomaly detection |
 
-#### Compliance (컴플라이언스)
+#### Compliance
 | Directory | Purpose |
 |-----------|---------|
-| `owasp-check/` | OWASP Top 10 체크리스트 점검 |
-| `isms-checklist/` | ISMS-P 인증 항목 점검 |
+| `owasp-check/` | OWASP Top 10 checklist review |
+| `isms-checklist/` | ISMS-P certification item review |
 
 ### Infrastructure
 | Directory | Purpose |
 |-----------|---------|
-| `scripts/` | 검증 및 유틸리티 스크립트 (see `scripts/AGENTS.md`) |
-| `docs/` | 설치/기여 문서 (see `docs/AGENTS.md`) |
+| `scripts/` | Validation and utility scripts (see `scripts/AGENTS.md`) |
+| `docs/` | Installation and contribution documentation (see `docs/AGENTS.md`) |
 
 ## For AI Agents
 
 ### Working In This Directory
-- 스킬 디렉토리는 루트에 flat하게 배치 — 중첩 금지
-- 각 스킬 디렉토리에는 `SKILL.md` 하나만 존재
-- 실행 코드는 기존 보안 도구에 위임, 스킬 자체에 소스코드 포함 금지
-- 새 스킬 추가 시 `docs/contributing.md` 참조
+- Skill directories are placed flat at the root — no nesting
+- Each skill directory contains only one `SKILL.md`
+- Execution is delegated to existing security tools; do not include source code inside skills
+- When adding a new skill, refer to `docs/contributing.md`
 
 ### Testing Requirements
 ```bash
-./scripts/validate-skills.sh   # 구조 검증
-npm test                       # 문서 컨벤션 테스트
+./scripts/validate-skills.sh   # Structure validation
+npm test                       # Documentation convention tests
 ```
 
 ### Common Patterns
-- SKILL.md YAML 프론트매터: `name`, `description`, `license`, `metadata.category`
-- 크리덴셜 해결 순서: 환경변수 → `~/.config/security-skill/secrets.env` → 사용자 질의
-- 환경변수 접두사: `SECSKILL_`
+- SKILL.md YAML frontmatter: `name`, `description`, `license`, `metadata.category`
+- Credential resolution order: environment variables → `~/.config/security-skill/secrets.env` → query user
+- Environment variable prefix: `SECSKILL_`
 
 ## Dependencies
 
 ### External
-- Node.js >= 18 (검증 스크립트 실행)
-- Go toolchain (subfinder, nuclei, httpx, trufflehog 설치)
-- Python 3 (pip-audit, holehe, hashid, wafw00f 등)
+- Node.js >= 18 (for running validation scripts)
+- Go toolchain (for installing subfinder, nuclei, httpx, trufflehog)
+- Python 3 (pip-audit, holehe, hashid, wafw00f, etc.)
 - System packages: nmap, whois, dnsutils, openssl, jq, curl
 
 <!-- MANUAL: -->

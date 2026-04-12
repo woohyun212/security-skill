@@ -4,55 +4,55 @@ description: OWASP Top 10 (2021) checklist-based inspection and compliance matri
 license: MIT
 metadata:
   category: compliance
-  locale: ko-KR
+  locale: en
   phase: v1
 ---
 
-## 이 스킬이 하는 일
+## What this skill does
 
-OWASP Top 10 2021 기준으로 대상 애플리케이션의 보안 통제를 점검합니다. 10개 카테고리(A01~A10)별로 방어 현황을 질의하고, Pass/Fail/N-A 컴플라이언스 매트릭스를 생성합니다. 실패 항목에 대해 공식 OWASP 참조 링크와 함께 우선순위별 개선 방안을 제공합니다.
+Inspects security controls of a target application against the OWASP Top 10 2021 standard. Queries the defense status for each of the 10 categories (A01–A10) and generates a Pass/Fail/N-A compliance matrix. Provides prioritized remediation recommendations with official OWASP reference links for each failed item.
 
-## 언제 사용하나요
+## When to use
 
-- 애플리케이션 보안 리뷰 또는 출시 전 점검을 수행할 때
-- 보안 감사 준비를 위한 OWASP 기반 자가진단이 필요할 때
-- 개발팀에게 보안 요구사항을 체계적으로 전달할 때
-- 침투 테스트 전 위험 우선순위를 파악할 때
+- When conducting an application security review or pre-release inspection
+- When performing an OWASP-based self-assessment in preparation for a security audit
+- When systematically communicating security requirements to a development team
+- When identifying risk priorities before a penetration test
 
-## 사전 요구 사항
+## Prerequisites
 
-- 외부 도구 불필요 (체크리스트 기반)
-- 점검 담당자의 대상 애플리케이션 기술 스택 지식
+- No external tools required (checklist-based)
+- Inspector's knowledge of the target application's technology stack
 
-## 입력
+## Inputs
 
-| 항목 | 설명 | 예시 |
-|------|------|------|
-| `APP_NAME` | 점검 대상 애플리케이션 이름 | `MyWebApp v2.3` |
-| `APP_TYPE` | 애플리케이션 유형 | `web` / `api` / `mobile` |
-| `TECH_STACK` | 사용 기술 스택 (선택) | `Node.js, PostgreSQL, React` |
+| Item | Description | Example |
+|------|-------------|---------|
+| `APP_NAME` | Name of the application under review | `MyWebApp v2.3` |
+| `APP_TYPE` | Application type | `web` / `api` / `mobile` |
+| `TECH_STACK` | Technology stack in use (optional) | `Node.js, PostgreSQL, React` |
 
-## 워크플로
+## Workflow
 
-### 1단계: 점검 대상 정보 수집
+### Step 1: Collect target application information
 
 ```bash
-read -rp "애플리케이션 이름: " APP_NAME
-read -rp "유형 (web/api/mobile): " APP_TYPE
-read -rp "기술 스택 (예: Node.js, PostgreSQL): " TECH_STACK
+read -rp "Application name: " APP_NAME
+read -rp "Type (web/api/mobile): " APP_TYPE
+read -rp "Tech stack (e.g. Node.js, PostgreSQL): " TECH_STACK
 
 REPORT_FILE="/tmp/owasp_check_$(date +%Y%m%d_%H%M%S).md"
-echo "# OWASP Top 10 2021 점검 결과" > "$REPORT_FILE"
+echo "# OWASP Top 10 2021 Inspection Results" > "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
-echo "- **대상**: $APP_NAME" >> "$REPORT_FILE"
-echo "- **유형**: $APP_TYPE" >> "$REPORT_FILE"
-echo "- **스택**: $TECH_STACK" >> "$REPORT_FILE"
-echo "- **점검일**: $(date '+%Y-%m-%d')" >> "$REPORT_FILE"
+echo "- **Target**: $APP_NAME" >> "$REPORT_FILE"
+echo "- **Type**: $APP_TYPE" >> "$REPORT_FILE"
+echo "- **Stack**: $TECH_STACK" >> "$REPORT_FILE"
+echo "- **Date**: $(date '+%Y-%m-%d')" >> "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
-echo "[+] 보고서 파일 초기화: $REPORT_FILE"
+echo "[+] Report file initialized: $REPORT_FILE"
 ```
 
-### 2단계: OWASP Top 10 2021 항목별 질의
+### Step 2: Query each OWASP Top 10 2021 category
 
 ```bash
 python3 - "$REPORT_FILE" "$APP_NAME" <<'PYEOF'
@@ -64,107 +64,107 @@ app_name = sys.argv[2]
 categories = [
     {
         "id": "A01",
-        "name": "접근 통제 취약점 (Broken Access Control)",
+        "name": "Broken Access Control",
         "questions": [
-            "수직/수평 권한 분리가 구현되어 있습니까? (예: 일반 사용자가 관리자 페이지 접근 불가)",
-            "URL 직접 접근, 파라미터 변조를 통한 권한 우회가 차단되어 있습니까?",
-            "CORS 정책이 허용 오리진을 명시적으로 제한합니까?",
-            "디렉토리 리스팅이 비활성화되어 있습니까?",
+            "Is vertical/horizontal privilege separation implemented? (e.g. regular users cannot access admin pages)",
+            "Is bypass of authorization via direct URL access or parameter tampering blocked?",
+            "Does the CORS policy explicitly restrict allowed origins?",
+            "Is directory listing disabled?",
         ],
         "ref": "https://owasp.org/Top10/A01_2021-Broken_Access_Control/"
     },
     {
         "id": "A02",
-        "name": "암호화 실패 (Cryptographic Failures)",
+        "name": "Cryptographic Failures",
         "questions": [
-            "전송 중 데이터에 TLS 1.2 이상이 적용되어 있습니까?",
-            "비밀번호가 bcrypt/Argon2/scrypt 등 단방향 해시로 저장됩니까?",
-            "민감 데이터(카드번호, SSN 등)가 암호화되어 저장됩니까?",
-            "하드코딩된 암호화 키나 자격증명이 없습니까?",
+            "Is TLS 1.2 or higher applied to data in transit?",
+            "Are passwords stored using one-way hashes such as bcrypt/Argon2/scrypt?",
+            "Is sensitive data (card numbers, SSNs, etc.) encrypted at rest?",
+            "Are there no hardcoded encryption keys or credentials?",
         ],
         "ref": "https://owasp.org/Top10/A02_2021-Cryptographic_Failures/"
     },
     {
         "id": "A03",
-        "name": "인젝션 (Injection)",
+        "name": "Injection",
         "questions": [
-            "모든 DB 쿼리에 파라미터화 쿼리(Prepared Statement)를 사용합니까?",
-            "사용자 입력에 대한 서버 측 입력 검증이 구현되어 있습니까?",
-            "ORM 사용 시 raw 쿼리 사용을 최소화하고 있습니까?",
-            "OS 명령어 실행 시 사용자 입력이 포함되지 않도록 통제합니까?",
+            "Are parameterized queries (Prepared Statements) used for all DB queries?",
+            "Is server-side input validation implemented for user input?",
+            "Is raw query usage minimized when using an ORM?",
+            "Is user input excluded from OS command execution?",
         ],
         "ref": "https://owasp.org/Top10/A03_2021-Injection/"
     },
     {
         "id": "A04",
-        "name": "안전하지 않은 설계 (Insecure Design)",
+        "name": "Insecure Design",
         "questions": [
-            "위협 모델링(Threat Modeling)이 설계 단계에서 수행됩니까?",
-            "비즈니스 로직에 대한 보안 요구사항이 정의되어 있습니까?",
-            "중요 기능에 대한 속도 제한(Rate Limiting)이 구현되어 있습니까?",
+            "Is threat modeling performed during the design phase?",
+            "Are security requirements defined for business logic?",
+            "Is rate limiting implemented for critical functions?",
         ],
         "ref": "https://owasp.org/Top10/A04_2021-Insecure_Design/"
     },
     {
         "id": "A05",
-        "name": "보안 설정 오류 (Security Misconfiguration)",
+        "name": "Security Misconfiguration",
         "questions": [
-            "불필요한 기능, 포트, 서비스, 계정이 비활성화되어 있습니까?",
-            "기본 계정/비밀번호가 변경되었습니까?",
-            "오류 메시지에 스택 트레이스나 내부 정보가 노출되지 않습니까?",
-            "보안 HTTP 헤더(CSP, HSTS, X-Frame-Options 등)가 설정되어 있습니까?",
+            "Are unnecessary features, ports, services, and accounts disabled?",
+            "Have default accounts/passwords been changed?",
+            "Do error messages avoid exposing stack traces or internal information?",
+            "Are security HTTP headers (CSP, HSTS, X-Frame-Options, etc.) configured?",
         ],
         "ref": "https://owasp.org/Top10/A05_2021-Security_Misconfiguration/"
     },
     {
         "id": "A06",
-        "name": "취약하고 오래된 컴포넌트 (Vulnerable and Outdated Components)",
+        "name": "Vulnerable and Outdated Components",
         "questions": [
-            "사용 중인 라이브러리/프레임워크 버전을 정기적으로 확인합니까?",
-            "알려진 CVE가 있는 컴포넌트를 즉시 패치하는 프로세스가 있습니까?",
-            "SCA(Software Composition Analysis) 도구를 CI/CD에 통합했습니까?",
+            "Are the versions of libraries/frameworks in use regularly reviewed?",
+            "Is there a process to promptly patch components with known CVEs?",
+            "Is an SCA (Software Composition Analysis) tool integrated into CI/CD?",
         ],
         "ref": "https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/"
     },
     {
         "id": "A07",
-        "name": "인증 및 인증 실패 (Identification and Authentication Failures)",
+        "name": "Identification and Authentication Failures",
         "questions": [
-            "브루트포스 방어를 위한 계정 잠금 또는 CAPTCHA가 구현되어 있습니까?",
-            "다중 인증(MFA)이 지원됩니까 (특히 관리자 계정)?",
-            "세션 ID가 로그인 후 재생성됩니까?",
-            "비밀번호 복잡성 요구사항이 있습니까?",
+            "Is account lockout or CAPTCHA implemented to defend against brute-force attacks?",
+            "Is multi-factor authentication (MFA) supported (especially for admin accounts)?",
+            "Is the session ID regenerated after login?",
+            "Are password complexity requirements enforced?",
         ],
         "ref": "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/"
     },
     {
         "id": "A08",
-        "name": "소프트웨어 및 데이터 무결성 실패 (Software and Data Integrity Failures)",
+        "name": "Software and Data Integrity Failures",
         "questions": [
-            "CI/CD 파이프라인에 무결성 검증이 포함되어 있습니까?",
-            "외부 CDN/패키지의 무결성 해시(SRI)를 검증합니까?",
-            "역직렬화 시 신뢰할 수 없는 데이터 소스를 차단합니까?",
+            "Does the CI/CD pipeline include integrity verification?",
+            "Are integrity hashes (SRI) verified for external CDN/packages?",
+            "Are untrusted data sources blocked during deserialization?",
         ],
         "ref": "https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/"
     },
     {
         "id": "A09",
-        "name": "보안 로깅 및 모니터링 실패 (Security Logging and Monitoring Failures)",
+        "name": "Security Logging and Monitoring Failures",
         "questions": [
-            "로그인 실패, 권한 오류, 입력 검증 실패가 로깅됩니까?",
-            "로그에 민감 정보(비밀번호, 토큰)가 포함되지 않습니까?",
-            "보안 이벤트에 대한 알림/모니터링 체계가 있습니까?",
-            "로그가 변조 방지된 원격 저장소에 보관됩니까?",
+            "Are login failures, authorization errors, and input validation failures logged?",
+            "Do logs avoid including sensitive information (passwords, tokens)?",
+            "Is there an alerting/monitoring system for security events?",
+            "Are logs stored in a tamper-resistant remote repository?",
         ],
         "ref": "https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/"
     },
     {
         "id": "A10",
-        "name": "서버측 요청 위조 (Server-Side Request Forgery, SSRF)",
+        "name": "Server-Side Request Forgery (SSRF)",
         "questions": [
-            "사용자가 제공한 URL로의 서버 요청 시 허용 목록(allowlist)을 사용합니까?",
-            "내부 네트워크 주소(169.254.x.x, 10.x.x.x 등)로의 요청이 차단됩니까?",
-            "URL 리다이렉트 추적이 비활성화되어 있습니까?",
+            "Is an allowlist used for server-side requests to user-supplied URLs?",
+            "Are requests to internal network addresses (169.254.x.x, 10.x.x.x, etc.) blocked?",
+            "Is URL redirect following disabled?",
         ],
         "ref": "https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/"
     },
@@ -173,8 +173,8 @@ categories = [
 results = {}
 
 print("\n" + "=" * 60)
-print("OWASP Top 10 2021 항목별 점검")
-print("각 질문에 y(Pass) / n(Fail) / s(Skip/N-A) 로 답하세요")
+print("OWASP Top 10 2021 Category Inspection")
+print("Answer each question with y(Pass) / n(Fail) / s(Skip/N-A)")
 print("=" * 60)
 
 for cat in categories:
@@ -185,16 +185,16 @@ for cat in categories:
             ans = input(f"  Q{i}. {q}\n  -> ").strip().lower()
             if ans in ('y', 'n', 's', ''):
                 break
-            print("  y, n, s 중 하나를 입력하세요")
+            print("  Please enter one of: y, n, s")
         status = {'y': 'PASS', 'n': 'FAIL', 's': 'N/A', '': 'N/A'}[ans]
         cat_results.append((q, status))
     results[cat['id']] = {'name': cat['name'], 'items': cat_results, 'ref': cat['ref']}
 
-# 매트릭스 생성
+# Generate compliance matrix
 with open(report_file, 'a') as f:
-    f.write("## 컴플라이언스 매트릭스\n\n")
-    f.write("| ID | 카테고리 | PASS | FAIL | N/A | 결과 |\n")
-    f.write("|-----|---------|:----:|:----:|:---:|------|\n")
+    f.write("## Compliance Matrix\n\n")
+    f.write("| ID | Category | PASS | FAIL | N/A | Result |\n")
+    f.write("|-----|---------|:----:|:----:|:---:|--------|\n")
 
     fail_items = []
     for cat_id, data in results.items():
@@ -207,76 +207,75 @@ with open(report_file, 'a') as f:
         elif fails == 0:
             overall = "PASS"
         else:
-            overall = f"FAIL ({fails}건)"
+            overall = f"FAIL ({fails})"
             fail_items.append((cat_id, data))
         f.write(f"| {cat_id} | {data['name']} | {passes} | {fails} | {na} | {overall} |\n")
 
-    f.write("\n## 실패 항목 개선 방안\n\n")
+    f.write("\n## Remediation Recommendations for Failed Items\n\n")
     if fail_items:
         for cat_id, data in fail_items:
             f.write(f"### {cat_id}: {data['name']}\n\n")
-            f.write(f"**참조**: {data['ref']}\n\n")
+            f.write(f"**Reference**: {data['ref']}\n\n")
             for q, s in data['items']:
                 if s == 'FAIL':
                     f.write(f"- [ ] {q}\n")
             f.write("\n")
     else:
-        f.write("실패 항목 없음\n\n")
+        f.write("No failed items.\n\n")
 
-print("\n[+] 점검 완료!")
+print("\n[+] Inspection complete!")
 PYEOF
 ```
 
-### 3단계: 컴플라이언스 매트릭스 출력
+### Step 3: Print compliance matrix
 
 ```bash
 echo ""
-echo "=== 최종 컴플라이언스 매트릭스 ==="
-grep -A 20 "## 컴플라이언스 매트릭스" "$REPORT_FILE" | head -20
+echo "=== Final Compliance Matrix ==="
+grep -A 20 "## Compliance Matrix" "$REPORT_FILE" | head -20
 
 FAIL_COUNT=$(grep -c "FAIL" "$REPORT_FILE" 2>/dev/null || echo 0)
 echo ""
-echo "[요약]"
-echo "  총 실패 항목: $FAIL_COUNT"
-echo "  상세 보고서: $REPORT_FILE"
+echo "[Summary]"
+echo "  Total failed items: $FAIL_COUNT"
+echo "  Detailed report: $REPORT_FILE"
 ```
 
-### 4단계: 우선순위별 개선 권고 출력
+### Step 4: Print prioritized remediation recommendations
 
 ```bash
 echo ""
-echo "=== 우선순위별 개선 권고 ==="
+echo "=== Prioritized Remediation Recommendations ==="
 echo ""
-echo "[높음] 즉시 조치 필요"
-echo "  A01 접근 통제, A03 인젝션, A07 인증 실패 → 직접적인 데이터 유출 위험"
+echo "[HIGH] Immediate action required"
+echo "  A01 Broken Access Control, A03 Injection, A07 Authentication Failures -> Direct data exposure risk"
 echo ""
-echo "[중간] 단기 조치"
-echo "  A02 암호화, A05 보안 설정, A06 취약 컴포넌트 → 패치/설정으로 해결 가능"
+echo "[MEDIUM] Short-term action"
+echo "  A02 Cryptographic Failures, A05 Security Misconfiguration, A06 Outdated Components -> Resolved by patching/reconfiguration"
 echo ""
-echo "[낮음] 장기 계획"
-echo "  A04 안전하지 않은 설계, A08 무결성, A09 로깅, A10 SSRF → 프로세스/아키텍처 개선"
+echo "[LOW] Long-term planning"
+echo "  A04 Insecure Design, A08 Integrity Failures, A09 Logging Failures, A10 SSRF -> Process/architecture improvements"
 echo ""
-echo "[+] OWASP Top 10 전체 참조: https://owasp.org/Top10/"
-echo "[+] 한국어 번역본: https://owasp.org/www-project-top-ten/"
+echo "[+] Full OWASP Top 10 reference: https://owasp.org/Top10/"
 ```
 
-## 완료 조건
+## Done when
 
-- 10개 카테고리 모두 질의 완료
-- `/tmp/owasp_check_<날짜>.md` 보고서에 컴플라이언스 매트릭스 저장됨
-- FAIL 항목별 OWASP 참조 링크와 개선 체크리스트가 포함됨
+- All 10 categories have been queried
+- Compliance matrix saved to `/tmp/owasp_check_<date>.md` report
+- OWASP reference links and remediation checklists included for each FAIL item
 
-## 실패 모드
+## Failure modes
 
-| 문제 | 원인 | 해결책 |
-|------|------|--------|
-| 점검 중단 | 터미널 세션 종료 | 재실행 후 N/A(s)로 스킵 가능 |
-| 결과 파일 없음 | `/tmp` 권한 문제 | `REPORT_FILE=~/owasp_result.md` 로 변경 |
-| 질문 이해 어려움 | 기술 맥락 부족 | 각 참조 링크의 설명 섹션 참고 |
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Inspection interrupted | Terminal session closed | Re-run and skip completed items with N/A (s) |
+| Report file missing | `/tmp` permission issue | Change to `REPORT_FILE=~/owasp_result.md` |
+| Question hard to understand | Insufficient technical context | Refer to the description section of each reference link |
 
-## 참고 사항
+## Notes
 
-- N/A(s) 선택은 해당 질문이 현재 스택에 적용되지 않을 때 사용하세요. (예: SPA 앱에서 서버사이드 렌더링 관련 질문)
-- 점검 결과는 보안팀 또는 개발팀과 공유하여 개선 로드맵 수립에 활용하세요.
-- ISMS-P 인증 준비 중이라면 `isms-checklist` 스킬과 병행 점검을 권장합니다.
-- 점검 결과는 공식 감사를 대체하지 않으며, 전문 침투 테스트와 병행하세요.
+- Use N/A (s) when a question does not apply to the current stack (e.g. server-side rendering questions for an SPA app).
+- Share inspection results with the security team or development team to build a remediation roadmap.
+- If preparing for ISMS-P certification, recommend running this skill alongside the `isms-checklist` skill.
+- Inspection results do not replace a formal audit; use alongside professional penetration testing.

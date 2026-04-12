@@ -4,34 +4,34 @@ description: Analyze HTTP security headers of a target URL and provide remediati
 license: MIT
 metadata:
   category: web-security
-  locale: ko-KR
+  locale: en
   phase: v1
 ---
 
-## 이 스킬이 하는 일
+## What this skill does
 
-대상 URL에 HTTP 요청을 보내 응답 헤더를 수집하고, 보안 관련 헤더의 존재 여부와 설정 적절성을 검사합니다. 각 헤더를 present / missing / misconfigured 중 하나로 판정하고, 누락되거나 잘못 설정된 헤더에 대해 수정 권고안을 제시합니다.
+Sends an HTTP request to the target URL, collects response headers, and checks for the presence and proper configuration of security-related headers. Classifies each header as present, missing, or misconfigured, and provides remediation recommendations for missing or improperly configured headers.
 
-## 언제 사용하나요
+## When to use
 
-- 웹 애플리케이션 보안 점검(초기 정찰 단계)을 수행할 때
-- 배포 전 보안 체크리스트를 실행할 때
-- 버그 바운티 또는 침투 테스트에서 헤더 취약점을 빠르게 확인할 때
+- During web application security assessments (initial reconnaissance phase)
+- When running a pre-deployment security checklist
+- During bug bounty or penetration testing to quickly identify header vulnerabilities
 
-## 사전 조건
+## Prerequisites
 
-- `curl` 설치 필요 (대부분의 Linux/macOS에 기본 내장)
-- 대상 서버에 대한 HTTP/HTTPS 접근 권한
+- `curl` installed (included by default on most Linux/macOS systems)
+- HTTP/HTTPS access to the target server
 
-## 입력
+## Inputs
 
-| 변수 | 설명 | 예시 |
-|------|------|------|
-| `TARGET_URL` | 점검할 대상 URL (스킴 포함) | `https://example.com` |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `TARGET_URL` | Target URL to check (including scheme) | `https://example.com` |
 
-## 워크플로우
+## Workflow
 
-### 1단계: 응답 헤더 수집
+### Step 1: Collect response headers
 
 ```bash
 TARGET_URL="https://example.com"
@@ -41,11 +41,11 @@ curl -s -I -L \
   --user-agent "SecurityHeadersCheck/1.0" \
   "$TARGET_URL" 2>&1 | tee /tmp/headers_raw.txt
 
-echo "=== 수집된 헤더 ==="
+echo "=== Collected Headers ==="
 cat /tmp/headers_raw.txt
 ```
 
-### 2단계: 개별 보안 헤더 검사
+### Step 2: Check individual security headers
 
 ```bash
 check_header() {
@@ -61,7 +61,7 @@ check_header() {
 }
 
 echo ""
-echo "=== 보안 헤더 점검 결과 ==="
+echo "=== Security Header Check Results ==="
 check_header "X-Content-Type-Options"    "x-content-type-options"
 check_header "X-Frame-Options"           "x-frame-options"
 check_header "Strict-Transport-Security" "strict-transport-security"
@@ -71,84 +71,84 @@ check_header "Referrer-Policy"           "referrer-policy"
 check_header "Permissions-Policy"        "permissions-policy"
 ```
 
-### 3단계: 잘못된 설정 탐지
+### Step 3: Detect misconfigured headers
 
 ```bash
 echo ""
-echo "=== 설정 오류 검사 ==="
+echo "=== Misconfiguration Check ==="
 
-# HSTS: max-age 가 너무 짧으면 경고
+# HSTS: warn if max-age is too short
 hsts=$(grep -i "^strict-transport-security:" /tmp/headers_raw.txt | head -1)
 if [ -n "$hsts" ]; then
   max_age=$(echo "$hsts" | grep -oP 'max-age=\K[0-9]+')
   if [ -n "$max_age" ] && [ "$max_age" -lt 31536000 ]; then
-    echo "[MISCONFIGURED] HSTS max-age=$max_age (권장: 31536000 이상)"
+    echo "[MISCONFIGURED] HSTS max-age=$max_age (recommended: 31536000 or higher)"
   else
-    echo "[OK] HSTS max-age 충분"
+    echo "[OK] HSTS max-age is sufficient"
   fi
 fi
 
-# X-XSS-Protection: 1; mode=block 이 아니면 경고
+# X-XSS-Protection: warn if not set to 1; mode=block
 xxp=$(grep -i "^x-xss-protection:" /tmp/headers_raw.txt | head -1)
 if [ -n "$xxp" ]; then
   if echo "$xxp" | grep -qi "0"; then
-    echo "[MISCONFIGURED] X-XSS-Protection: 0 으로 비활성화됨"
+    echo "[MISCONFIGURED] X-XSS-Protection: disabled with value 0"
   fi
 fi
 
-# X-Frame-Options: ALLOW-FROM 은 구식 방식
+# X-Frame-Options: ALLOW-FROM is an outdated approach
 xfo=$(grep -i "^x-frame-options:" /tmp/headers_raw.txt | head -1)
 if [ -n "$xfo" ]; then
   if echo "$xfo" | grep -qi "allow-from"; then
-    echo "[MISCONFIGURED] X-Frame-Options ALLOW-FROM 은 대부분 브라우저에서 미지원. CSP frame-ancestors 사용 권장"
+    echo "[MISCONFIGURED] X-Frame-Options ALLOW-FROM is not supported by most browsers. Use CSP frame-ancestors instead."
   fi
 fi
 ```
 
-### 4단계: 수정 권고안 출력
+### Step 4: Output remediation recommendations
 
 ```bash
 echo ""
-echo "=== 수정 권고안 ==="
+echo "=== Remediation Recommendations ==="
 
 grep -qi "^x-content-type-options:" /tmp/headers_raw.txt || \
-  echo "X-Content-Type-Options: nosniff  # MIME 타입 스니핑 방지"
+  echo "X-Content-Type-Options: nosniff  # Prevent MIME type sniffing"
 
 grep -qi "^x-frame-options:" /tmp/headers_raw.txt || \
-  echo "X-Frame-Options: DENY  # 클릭재킹 방지 (또는 Content-Security-Policy: frame-ancestors 'none')"
+  echo "X-Frame-Options: DENY  # Prevent clickjacking (or use Content-Security-Policy: frame-ancestors 'none')"
 
 grep -qi "^strict-transport-security:" /tmp/headers_raw.txt || \
-  echo "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload  # HTTPS 강제"
+  echo "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload  # Enforce HTTPS"
 
 grep -qi "^content-security-policy:" /tmp/headers_raw.txt || \
-  echo "Content-Security-Policy: default-src 'self'  # XSS/데이터 삽입 공격 방지 (정책은 애플리케이션에 맞게 조정)"
+  echo "Content-Security-Policy: default-src 'self'  # Prevent XSS/data injection attacks (adjust policy to your application)"
 
 grep -qi "^referrer-policy:" /tmp/headers_raw.txt || \
-  echo "Referrer-Policy: strict-origin-when-cross-origin  # Referer 헤더 정보 노출 제한"
+  echo "Referrer-Policy: strict-origin-when-cross-origin  # Limit Referer header information exposure"
 
 grep -qi "^permissions-policy:" /tmp/headers_raw.txt || \
-  echo "Permissions-Policy: geolocation=(), microphone=(), camera=()  # 브라우저 기능 제한"
+  echo "Permissions-Policy: geolocation=(), microphone=(), camera=()  # Restrict browser feature access"
 
 echo ""
-echo "참고: https://securityheaders.com 에서 상세 등급 확인 가능"
+echo "Reference: https://securityheaders.com for detailed grading"
 ```
 
-## 완료 조건
+## Done when
 
-- 7개 보안 헤더 각각에 대해 present / missing / misconfigured 판정이 출력됨
-- 누락/잘못된 헤더에 대한 구체적인 헤더 값 예시가 제시됨
+- Each of the 7 security headers is judged as present, missing, or misconfigured
+- Concrete header value examples are provided for missing or misconfigured headers
 
-## 실패 모드
+## Failure modes
 
-| 증상 | 원인 및 해결 |
-|------|-------------|
-| `curl: (6) Could not resolve host` | DNS 미해결. URL 및 네트워크 연결 확인 |
-| `curl: (60) SSL certificate problem` | 자체 서명 인증서. `-k` 플래그 추가 (테스트 환경 한정) |
-| 헤더가 비어 있음 | CDN/프록시 뒤에서 헤더를 제거할 수 있음. 원본 서버 직접 점검 고려 |
-| 302/301 리디렉션 후 헤더 다름 | `-L` 플래그로 최종 목적지 헤더까지 추적 |
+| Symptom | Cause and Resolution |
+|---------|---------------------|
+| `curl: (6) Could not resolve host` | DNS not resolving. Check URL and network connectivity |
+| `curl: (60) SSL certificate problem` | Self-signed certificate. Add `-k` flag (test environments only) |
+| Headers are empty | CDN/proxy may be stripping headers. Consider checking the origin server directly |
+| Different headers after 302/301 redirect | Use `-L` flag to follow redirects to the final destination |
 
-## 참고
+## Notes
 
-- `Content-Security-Policy`는 정책이 복잡하므로 누락으로 판정해도 단순 권고에 그침. 실제 구성은 애플리케이션별로 검토 필요.
-- `X-XSS-Protection`은 최신 브라우저에서 사용 중단(deprecated)됨. 새 프로젝트는 CSP 사용 권장.
-- HTTPS 미사용 사이트는 HSTS 적용 불가.
+- `Content-Security-Policy` is complex; flagging it as missing results in a simple recommendation only. Actual configuration requires per-application review.
+- `X-XSS-Protection` is deprecated in modern browsers. New projects should use CSP instead.
+- HSTS cannot be applied to sites not using HTTPS.

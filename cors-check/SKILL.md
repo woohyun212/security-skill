@@ -4,51 +4,51 @@ description: Detect CORS misconfiguration by testing various Origin headers and 
 license: MIT
 metadata:
   category: web-security
-  locale: ko-KR
+  locale: en
   phase: v1
 ---
 
-## 이 스킬이 하는 일
+## What this skill does
 
-다양한 `Origin` 헤더 값을 포함한 HTTP 요청을 대상 URL에 전송해 CORS(Cross-Origin Resource Sharing) 정책의 취약점을 탐지합니다. `Access-Control-Allow-Origin`이 요청 Origin을 그대로 반영하거나, `null`을 허용하거나, `*`와 `Access-Control-Allow-Credentials: true`를 동시에 설정하는 등의 잘못된 구성을 식별합니다.
+Sends HTTP requests with various `Origin` header values to a target URL to detect vulnerabilities in CORS (Cross-Origin Resource Sharing) policy. Identifies misconfigurations such as `Access-Control-Allow-Origin` reflecting the request Origin verbatim, allowing `null`, or simultaneously setting `*` with `Access-Control-Allow-Credentials: true`.
 
-## 언제 사용하나요
+## When to use
 
-- API 엔드포인트의 CORS 정책을 점검할 때
-- 크로스 사이트 요청 위조(CSRF) 또는 자격증명 탈취 가능성을 확인할 때
-- 버그 바운티에서 CORS 기반 계정 탈취 취약점을 검증할 때
+- When auditing the CORS policy of an API endpoint
+- When checking for Cross-Site Request Forgery (CSRF) or credential theft possibilities
+- When validating CORS-based account takeover vulnerabilities in bug bounty programs
 
-## 사전 조건
+## Prerequisites
 
-- `curl` 설치 필요
-- 대상 URL에 대한 HTTP/HTTPS 접근 권한
+- `curl` must be installed
+- HTTP/HTTPS access to the target URL
 
-## 입력
+## Inputs
 
-| 변수 | 설명 | 예시 |
-|------|------|------|
-| `TARGET_URL` | 점검할 엔드포인트 URL | `https://api.example.com/user` |
-| `LEGITIMATE_ORIGIN` | 정상 오리진 (알고 있는 경우) | `https://example.com` |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `TARGET_URL` | Endpoint URL to test | `https://api.example.com/user` |
+| `LEGITIMATE_ORIGIN` | Known legitimate origin (if available) | `https://example.com` |
 
-## 워크플로우
+## Workflow
 
-### 1단계: 기본 CORS 응답 확인
+### Step 1: Check baseline CORS response
 
 ```bash
 TARGET_URL="https://api.example.com/user"
 LEGITIMATE_ORIGIN="https://example.com"
 
-echo "=== 기본 CORS 헤더 확인 (Origin 없음) ==="
+echo "=== Baseline CORS headers (no Origin) ==="
 curl -s -I -X GET "$TARGET_URL" \
   --max-time 10 2>&1 \
   | grep -i "access-control"
 ```
 
-### 2단계: 다양한 Origin 값으로 반사(reflection) 테스트
+### Step 2: Test reflection with various Origin values
 
 ```bash
 echo ""
-echo "=== Origin 반사 테스트 ==="
+echo "=== Origin reflection test ==="
 
 test_cors() {
   local label="$1"
@@ -64,40 +64,40 @@ test_cors() {
   acac=$(echo "$response" | grep -i "access-control-allow-credentials:" | tr -d '\r')
 
   echo "--- [$label] Origin: $origin ---"
-  echo "  ACAO: ${acao:-<없음>}"
-  echo "  ACAC: ${acac:-<없음>}"
+  echo "  ACAO: ${acao:-<none>}"
+  echo "  ACAC: ${acac:-<none>}"
 
-  # 위험 판정
+  # Risk assessment
   if echo "$acao" | grep -qi "$origin"; then
     if echo "$acac" | grep -qi "true"; then
-      echo "  [CRITICAL] Origin 반사 + Credentials=true → 자격증명 탈취 가능"
+      echo "  [CRITICAL] Origin reflected + Credentials=true -> credential theft possible"
     else
-      echo "  [WARNING]  Origin 반사됨 (Credentials 없음)"
+      echo "  [WARNING]  Origin reflected (no Credentials)"
     fi
   fi
   if echo "$acao" | grep -q '^\s*[Aa]ccess-[Cc]ontrol-[Aa]llow-[Oo]rigin:\s*\*'; then
     if echo "$acac" | grep -qi "true"; then
-      echo "  [CRITICAL] ACAO=* + Credentials=true → 브라우저 차단하지만 잘못된 설정"
+      echo "  [CRITICAL] ACAO=* + Credentials=true -> blocked by browser but still a misconfiguration"
     else
-      echo "  [INFO]     ACAO=* (와일드카드, 인증 없는 공개 API는 허용 가능)"
+      echo "  [INFO]     ACAO=* (wildcard; acceptable for unauthenticated public APIs)"
     fi
   fi
   echo ""
 }
 
-test_cors "정상 오리진"          "$LEGITIMATE_ORIGIN"
-test_cors "null Origin"          "null"
-test_cors "공격자 도메인"        "https://attacker.com"
-test_cors "서브도메인"           "https://sub.example.com"
-test_cors "접두사 유사 도메인"   "https://example.com.evil.com"
-test_cors "후미 슬래시 변형"     "${LEGITIMATE_ORIGIN}/"
-test_cors "HTTP 다운그레이드"    "http://example.com"
+test_cors "Legitimate origin"        "$LEGITIMATE_ORIGIN"
+test_cors "null Origin"              "null"
+test_cors "Attacker domain"          "https://attacker.com"
+test_cors "Subdomain"                "https://sub.example.com"
+test_cors "Prefix-similar domain"    "https://example.com.evil.com"
+test_cors "Trailing slash variant"   "${LEGITIMATE_ORIGIN}/"
+test_cors "HTTP downgrade"           "http://example.com"
 ```
 
-### 3단계: Preflight(OPTIONS) 요청 테스트
+### Step 3: Test Preflight (OPTIONS) request
 
 ```bash
-echo "=== Preflight OPTIONS 요청 테스트 ==="
+echo "=== Preflight OPTIONS request test ==="
 curl -s -I -X OPTIONS "$TARGET_URL" \
   -H "Origin: https://attacker.com" \
   -H "Access-Control-Request-Method: GET" \
@@ -106,47 +106,47 @@ curl -s -I -X OPTIONS "$TARGET_URL" \
   | grep -i "access-control"
 ```
 
-### 4단계: 결과 요약 및 위험도 평가
+### Step 4: Summarize results and assess risk
 
 ```bash
 echo ""
-echo "=== 위험도 판정 기준 ==="
+echo "=== Risk assessment criteria ==="
 cat <<'EOF'
-[CRITICAL]  ACAO가 요청 Origin을 반사 + ACAC: true
-            → 공격자가 인증된 API 요청을 크로스 사이트에서 실행 가능
+[CRITICAL]  ACAO reflects request Origin + ACAC: true
+            -> Attacker can execute authenticated API requests cross-site
 
 [HIGH]      ACAO: null + ACAC: true
-            → 샌드박스 iframe 또는 로컬 파일에서 악용 가능
+            -> Exploitable from sandboxed iframes or local files
 
-[MEDIUM]    ACAO가 요청 Origin을 반사 (ACAC 없음)
-            → 민감 데이터 응답이라면 위험
+[MEDIUM]    ACAO reflects request Origin (no ACAC)
+            -> Dangerous if the response contains sensitive data
 
-[LOW/INFO]  ACAO: * (와일드카드, ACAC 없음)
-            → 공개 API에는 의도된 동작일 수 있음
+[LOW/INFO]  ACAO: * (wildcard, no ACAC)
+            -> May be intentional for public APIs
 
-수정 권고:
-  - 허용 Origin을 화이트리스트로 고정 (동적 반사 금지)
-  - credentials=true 사용 시 와일드카드(*) 사용 불가
-  - null Origin 허용 금지
-  - Vary: Origin 헤더 추가 (캐시 오염 방지)
+Remediation:
+  - Fix allowed Origins to a whitelist (no dynamic reflection)
+  - Do not use wildcard (*) when credentials=true
+  - Disallow null Origin
+  - Add Vary: Origin header (prevents cache poisoning)
 EOF
 ```
 
-## 완료 조건
+## Done when
 
-- 8가지 이상의 Origin 변형에 대해 ACAO/ACAC 응답이 출력됨
-- 위험한 구성(반사+Credentials, null Origin 허용 등)이 자동으로 탐지되어 표시됨
+- ACAO/ACAC responses are printed for 8 or more Origin variants
+- Dangerous configurations (reflection + Credentials, null Origin allowed, etc.) are automatically detected and flagged
 
-## 실패 모드
+## Failure modes
 
-| 증상 | 원인 및 해결 |
-|------|-------------|
-| 모든 테스트에서 ACAO 헤더 없음 | CORS 정책 미설정 또는 동일 출처만 허용. 브라우저 동작과 별개로 curl 응답에는 없을 수 있음 |
-| 302 리디렉션으로 원하는 응답 없음 | `-L` 플래그 추가하거나 최종 URL 직접 지정 |
-| 서버가 OPTIONS 메서드 차단 | 405 응답은 Preflight 미지원을 의미. 단순 요청(GET/POST) 테스트로 대체 |
+| Symptom | Cause and resolution |
+|---------|----------------------|
+| No ACAO header on all tests | CORS policy not configured or same-origin only. curl responses may differ from browser behavior |
+| 302 redirect preventing expected response | Add `-L` flag or specify the final URL directly |
+| Server blocks OPTIONS method | 405 response means Preflight not supported. Fall back to simple request (GET/POST) testing |
 
-## 참고
+## Notes
 
-- 브라우저는 `ACAO: * + ACAC: true` 조합을 차단하지만, 서버 설정 자체는 잘못된 것이므로 보고 대상.
-- 서브도메인 XSS가 있다면 서브도메인 Origin 허용도 취약점이 될 수 있음.
-- 자동화 도구: `corsy` (https://github.com/s0md3v/Corsy) 사용 고려.
+- Browsers block the `ACAO: * + ACAC: true` combination, but the server configuration is still wrong and should be reported.
+- If a subdomain has XSS, allowing that subdomain as an Origin can also be a vulnerability.
+- Automation tool: consider using `corsy` (https://github.com/s0md3v/Corsy).

@@ -4,29 +4,29 @@ description: Dependency vulnerability audit across Node.js, Python, and Go ecosy
 license: MIT
 metadata:
   category: vuln-analysis
-  locale: ko
+  locale: en
   phase: vuln-analysis
 ---
 
-## 이 스킬이 하는 일
+## What this skill does
 
-프로젝트 유형(Node.js, Python, Go, 컨테이너)을 자동으로 감지하고 적절한 감사 도구(`npm audit`, `pip-audit`, `trivy`)를 실행합니다. 발견된 취약점을 심각도별로 집계하고, 수정 가능한 버전을 포함한 권고 사항을 출력합니다.
+Automatically detects the project type (Node.js, Python, Go, container) and runs the appropriate audit tool (`npm audit`, `pip-audit`, `trivy`). Aggregates discovered vulnerabilities by severity and outputs recommendations including fixed versions.
 
-## 언제 사용하나
+## When to use
 
-- 코드 리뷰 또는 배포 전 의존성 취약점을 점검할 때
-- CI/CD 파이프라인에서 자동화된 의존성 보안 게이트를 구성할 때
-- 오래된 프로젝트의 누적된 취약점을 한 번에 감사할 때
-- 컨테이너 이미지 또는 파일시스템의 취약점을 스캔할 때
+- When checking dependency vulnerabilities before a code review or deployment
+- When setting up an automated dependency security gate in a CI/CD pipeline
+- When auditing accumulated vulnerabilities in an aging project all at once
+- When scanning container images or filesystems for vulnerabilities
 
-## 사전 조건
+## Prerequisites
 
-- Node.js 프로젝트: `npm` 설치 (Node.js에 포함)
-- Python 프로젝트: `pip-audit` 설치:
+- Node.js projects: `npm` installed (included with Node.js)
+- Python projects: `pip-audit` installed:
   ```bash
   pip install pip-audit
   ```
-- 컨테이너/범용: `trivy` 설치:
+- Container/general use: `trivy` installed:
   ```bash
   # Ubuntu/Debian
   sudo apt-get install -y wget apt-transport-https gnupg
@@ -34,61 +34,61 @@ metadata:
   echo "deb https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
   sudo apt-get update && sudo apt-get install -y trivy
   ```
-- 환경 변수 `SECSKILL_PROJECT_PATH`: 프로젝트 루트 경로
+- Environment variable `SECSKILL_PROJECT_PATH`: project root path
 
-## 입력
+## Inputs
 
-| 변수 | 필수 | 설명 |
-|------|------|------|
-| `SECSKILL_PROJECT_PATH` | 필수 | 감사할 프로젝트 루트 경로 |
-| `SECSKILL_OUTPUT_DIR` | 선택 | 결과 저장 디렉터리 (기본: `./output`) |
-| `SECSKILL_MIN_SEVERITY` | 선택 | 최소 심각도 필터 `low/medium/high/critical` (기본: `medium`) |
-| `SECSKILL_TRIVY_TARGET` | 선택 | trivy 스캔 대상 (경로 또는 이미지명, 기본: 프로젝트 경로) |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SECSKILL_PROJECT_PATH` | Required | Project root path to audit |
+| `SECSKILL_OUTPUT_DIR` | Optional | Directory to save results (default: `./output`) |
+| `SECSKILL_MIN_SEVERITY` | Optional | Minimum severity filter `low/medium/high/critical` (default: `medium`) |
+| `SECSKILL_TRIVY_TARGET` | Optional | trivy scan target (path or image name, default: project path) |
 
-## 워크플로우
+## Workflow
 
-### 1단계: 환경 준비 및 프로젝트 유형 감지
+### Step 1: Environment setup and project type detection
 
 ```bash
-export PROJECT="${SECSKILL_PROJECT_PATH:?SECSKILL_PROJECT_PATH 환경 변수를 설정하세요}"
+export PROJECT="${SECSKILL_PROJECT_PATH:?Set the SECSKILL_PROJECT_PATH environment variable}"
 export OUTDIR="${SECSKILL_OUTPUT_DIR:-./output}"
 export MIN_SEV="${SECSKILL_MIN_SEVERITY:-medium}"
 mkdir -p "$OUTDIR"
 
 if [ ! -d "$PROJECT" ]; then
-  echo "[-] 경로를 찾을 수 없습니다: $PROJECT"
+  echo "[-] Path not found: $PROJECT"
   exit 1
 fi
 
-echo "[*] 프로젝트 유형 감지 중: $PROJECT"
+echo "[*] Detecting project type: $PROJECT"
 
 HAS_NPM=false
 HAS_PYTHON=false
 HAS_GO=false
 
-[ -f "$PROJECT/package.json" ] && HAS_NPM=true && echo "[+] Node.js 프로젝트 감지 (package.json)"
+[ -f "$PROJECT/package.json" ] && HAS_NPM=true && echo "[+] Node.js project detected (package.json)"
 [ -f "$PROJECT/package-lock.json" ] || [ -f "$PROJECT/yarn.lock" ] && HAS_NPM=true
-[ -f "$PROJECT/requirements.txt" ] || [ -f "$PROJECT/Pipfile" ] || [ -f "$PROJECT/pyproject.toml" ] && HAS_PYTHON=true && echo "[+] Python 프로젝트 감지"
-[ -f "$PROJECT/go.mod" ] && HAS_GO=true && echo "[+] Go 프로젝트 감지 (go.mod)"
+[ -f "$PROJECT/requirements.txt" ] || [ -f "$PROJECT/Pipfile" ] || [ -f "$PROJECT/pyproject.toml" ] && HAS_PYTHON=true && echo "[+] Python project detected"
+[ -f "$PROJECT/go.mod" ] && HAS_GO=true && echo "[+] Go project detected (go.mod)"
 
 SUMMARY_FILE="$OUTDIR/dependency_audit_summary.txt"
-echo "의존성 감사 보고서" > "$SUMMARY_FILE"
-echo "경로: $PROJECT" >> "$SUMMARY_FILE"
-echo "일시: $(date -u '+%Y-%m-%dT%H:%M:%SZ')" >> "$SUMMARY_FILE"
+echo "Dependency Audit Report" > "$SUMMARY_FILE"
+echo "Path : $PROJECT" >> "$SUMMARY_FILE"
+echo "Date : $(date -u '+%Y-%m-%dT%H:%M:%SZ')" >> "$SUMMARY_FILE"
 echo "" >> "$SUMMARY_FILE"
 ```
 
-### 2단계: npm audit (Node.js)
+### Step 2: npm audit (Node.js)
 
 ```bash
 if [ "$HAS_NPM" = "true" ]; then
   echo ""
-  echo "[*] npm audit 실행 중..."
+  echo "[*] Running npm audit..."
   cd "$PROJECT"
 
-  # package-lock.json 없으면 생성
+  # Generate package-lock.json if missing
   if [ ! -f "package-lock.json" ] && [ ! -f "yarn.lock" ]; then
-    echo "[*] package-lock.json 생성 중..."
+    echo "[*] Generating package-lock.json..."
     npm install --package-lock-only --silent 2>/dev/null
   fi
 
@@ -101,30 +101,30 @@ if [ "$HAS_NPM" = "true" ]; then
   NPM_CRITICAL=$(jq '.metadata.vulnerabilities.critical' "$OUTDIR/npm_audit.json" 2>/dev/null || echo "0")
   NPM_HIGH=$(jq '.metadata.vulnerabilities.high' "$OUTDIR/npm_audit.json" 2>/dev/null || echo "0")
 
-  echo "[+] npm audit 완료: 총 $NPM_TOTAL 건 (critical: $NPM_CRITICAL, high: $NPM_HIGH)"
+  echo "[+] npm audit complete: $NPM_TOTAL total (critical: $NPM_CRITICAL, high: $NPM_HIGH)"
 
   cat >> "$SUMMARY_FILE" << EOF
 [ Node.js (npm audit) ]
-총 취약점: $NPM_TOTAL
+Total vulnerabilities : $NPM_TOTAL
   Critical : $NPM_CRITICAL
   High     : $NPM_HIGH
   Moderate : $(jq '.metadata.vulnerabilities.moderate' "$OUTDIR/npm_audit.json" 2>/dev/null || echo "0")
   Low      : $(jq '.metadata.vulnerabilities.low' "$OUTDIR/npm_audit.json" 2>/dev/null || echo "0")
 
-수정 가능 항목:
-$(jq -r '.vulnerabilities | to_entries[] | select(.value.severity == "critical" or .value.severity == "high") | "  - \(.key): \(.value.severity) -> \(.value.fixAvailable // "수동 수정 필요")"' "$OUTDIR/npm_audit.json" 2>/dev/null | head -10)
+Fixable items:
+$(jq -r '.vulnerabilities | to_entries[] | select(.value.severity == "critical" or .value.severity == "high") | "  - \(.key): \(.value.severity) -> \(.value.fixAvailable // "manual fix required")"' "$OUTDIR/npm_audit.json" 2>/dev/null | head -10)
 
 EOF
   cd - > /dev/null
 fi
 ```
 
-### 3단계: pip-audit (Python)
+### Step 3: pip-audit (Python)
 
 ```bash
 if [ "$HAS_PYTHON" = "true" ]; then
   echo ""
-  echo "[*] pip-audit 실행 중..."
+  echo "[*] Running pip-audit..."
 
   PIP_AUDIT_ARGS=""
   if [ -f "$PROJECT/requirements.txt" ]; then
@@ -138,25 +138,25 @@ if [ "$HAS_PYTHON" = "true" ]; then
     2>/dev/null
 
   PIP_TOTAL=$(jq '[.[].vulns[]] | length' "$OUTDIR/pip_audit.json" 2>/dev/null || echo "0")
-  echo "[+] pip-audit 완료: $PIP_TOTAL 건 발견"
+  echo "[+] pip-audit complete: $PIP_TOTAL findings"
 
   cat >> "$SUMMARY_FILE" << EOF
 [ Python (pip-audit) ]
-총 취약점: $PIP_TOTAL
+Total vulnerabilities : $PIP_TOTAL
 
-발견 항목:
-$(jq -r '.[] | select(.vulns | length > 0) | "  - \(.name) \(.version): \(.vulns | length)건 (\(.vulns[0].id // "?"))"' "$OUTDIR/pip_audit.json" 2>/dev/null | head -10)
+Findings:
+$(jq -r '.[] | select(.vulns | length > 0) | "  - \(.name) \(.version): \(.vulns | length) issue(s) (\(.vulns[0].id // "?"))"' "$OUTDIR/pip_audit.json" 2>/dev/null | head -10)
 
 EOF
 fi
 ```
 
-### 4단계: trivy (Go 및 범용)
+### Step 4: trivy (Go and general)
 
 ```bash
 if [ "$HAS_GO" = "true" ] || [ -f "$PROJECT/Dockerfile" ] || [ -f "$PROJECT/go.mod" ]; then
   echo ""
-  echo "[*] trivy 스캔 실행 중..."
+  echo "[*] Running trivy scan..."
   TRIVY_TARGET="${SECSKILL_TRIVY_TARGET:-$PROJECT}"
 
   if command -v trivy >/dev/null 2>&1; then
@@ -168,54 +168,54 @@ if [ "$HAS_GO" = "true" ] || [ -f "$PROJECT/Dockerfile" ] || [ -f "$PROJECT/go.m
       "$TRIVY_TARGET" 2>/dev/null
 
     TRIVY_TOTAL=$(jq '[.Results[]?.Vulnerabilities[]?] | length' "$OUTDIR/trivy_audit.json" 2>/dev/null || echo "0")
-    echo "[+] trivy 스캔 완료: $TRIVY_TOTAL 건 발견"
+    echo "[+] trivy scan complete: $TRIVY_TOTAL findings"
 
     cat >> "$SUMMARY_FILE" << EOF
-[ trivy (파일시스템 스캔) ]
-총 취약점: $TRIVY_TOTAL
+[ trivy (filesystem scan) ]
+Total vulnerabilities : $TRIVY_TOTAL
 
-Critical/High 항목:
-$(jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL" or .Severity == "HIGH") | "  - [\(.Severity)] \(.VulnerabilityID): \(.PkgName) \(.InstalledVersion) -> \(.FixedVersion // "수정 버전 없음")"' "$OUTDIR/trivy_audit.json" 2>/dev/null | head -15)
+Critical/High items:
+$(jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL" or .Severity == "HIGH") | "  - [\(.Severity)] \(.VulnerabilityID): \(.PkgName) \(.InstalledVersion) -> \(.FixedVersion // "no fix available")"' "$OUTDIR/trivy_audit.json" 2>/dev/null | head -15)
 
 EOF
   else
-    echo "[-] trivy 미설치. Go 감사를 건너뜁니다."
+    echo "[-] trivy not installed. Skipping Go audit."
   fi
 fi
 ```
 
-### 5단계: 전체 요약 출력
+### Step 5: Print overall summary
 
 ```bash
 echo ""
-echo "===== 의존성 감사 결과 요약 ====="
+echo "===== Dependency Audit Result Summary ====="
 cat "$SUMMARY_FILE"
-echo "=================================="
-echo "상세 결과:"
+echo "==========================================="
+echo "Detailed results:"
 [ -f "$OUTDIR/npm_audit.json" ] && echo "  npm   : $OUTDIR/npm_audit.json"
 [ -f "$OUTDIR/pip_audit.json" ] && echo "  pip   : $OUTDIR/pip_audit.json"
 [ -f "$OUTDIR/trivy_audit.json" ] && echo "  trivy : $OUTDIR/trivy_audit.json"
-echo "요약    : $SUMMARY_FILE"
+echo "Summary : $SUMMARY_FILE"
 ```
 
-## 완료 조건
+## Done when
 
-- 감지된 프로젝트 유형에 대해 적절한 감사 도구가 실행된다
-- 심각도별 취약점 수가 집계된다
-- 요약 파일이 생성된다
+- The appropriate audit tool runs for each detected project type
+- Vulnerability counts are aggregated by severity
+- Summary file is created
 
-## 실패 모드
+## Failure modes
 
-| 증상 | 원인 | 해결 방법 |
-|------|------|-----------|
-| `npm audit` 실패 | package-lock.json 없음 | `npm install` 먼저 실행 |
-| pip-audit 오류 | 가상환경 미활성화 | `source venv/bin/activate` 후 재실행 |
-| trivy DB 다운로드 느림 | 네트워크 속도 문제 | `trivy image --download-db-only` 사전 실행 |
-| 모든 도구 미감지 | 지원하지 않는 프로젝트 구조 | `SECSKILL_TRIVY_TARGET` 로 경로 명시 |
+| Symptom | Cause | Resolution |
+|---------|-------|------------|
+| `npm audit` fails | Missing package-lock.json | Run `npm install` first |
+| pip-audit error | Virtual environment not activated | Run `source venv/bin/activate` then retry |
+| trivy DB download slow | Network speed issue | Pre-download with `trivy image --download-db-only` |
+| No tools detected | Unsupported project structure | Specify path explicitly with `SECSKILL_TRIVY_TARGET` |
 
-## 참고
+## Notes
 
-- `npm audit fix` 로 자동 수정 가능한 취약점을 일괄 수정할 수 있습니다.
-- pip-audit는 `pip install --upgrade <package>` 권고를 포함합니다.
-- trivy는 OS 패키지, 언어별 의존성, 컨테이너 이미지를 모두 스캔합니다.
-- CI/CD 통합 시 critical 취약점 발견 시 빌드를 중단하는 게이트를 설정하세요.
+- Use `npm audit fix` to automatically fix all auto-fixable vulnerabilities in bulk.
+- pip-audit includes `pip install --upgrade <package>` recommendations.
+- trivy scans OS packages, language-specific dependencies, and container images.
+- For CI/CD integration, configure a build gate that fails the build when critical vulnerabilities are found.

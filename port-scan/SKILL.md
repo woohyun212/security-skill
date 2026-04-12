@@ -4,96 +4,96 @@ description: Port scanning and service detection with nmap for authorized securi
 license: MIT
 metadata:
   category: recon
-  locale: ko
+  locale: en
   phase: recon
 ---
 
-## 이 스킬이 하는 일
+## What this skill does
 
-nmap을 사용해 대상 호스트의 열린 포트를 탐지하고, 서비스 버전 및 운영체제 정보를 수집합니다. 빠른 상위 포트 스캔부터 상세 서비스 버전 탐지, OS 핑거프린팅까지 단계적으로 수행하며 구조화된 형식으로 결과를 저장합니다.
+Uses nmap to detect open ports on a target host and collect service version and operating system information. Performs staged scanning from a fast top-port scan through detailed service version detection and OS fingerprinting, saving results in structured formats.
 
-> **중요**: 이 스킬은 반드시 **명시적인 서면 승인**을 받은 시스템에만 사용해야 합니다. 무단 포트 스캔은 대부분의 국가에서 불법이며, 서비스 약관 위반에 해당합니다.
+> **Important**: This skill must only be used on systems where **explicit written authorization** has been obtained. Unauthorized port scanning is illegal in most jurisdictions and violates terms of service.
 
-## 언제 사용하나
+## When to use
 
-- 침투 테스트 범위 내 서비스 인벤토리를 구성할 때
-- 불필요하게 노출된 서비스를 탐지할 때
-- 특정 서비스의 버전을 확인해 CVE를 매핑할 때
-- 네트워크 방어 상태를 주기적으로 감사할 때
+- Building a service inventory within a penetration testing scope
+- Detecting unnecessarily exposed services
+- Verifying service versions to map CVEs
+- Periodically auditing network defense posture
 
-## 사전 조건
+## Prerequisites
 
-- nmap 설치:
+- Install nmap:
   ```bash
   # Ubuntu/Debian
   sudo apt-get install -y nmap
   # CentOS/RHEL
   sudo yum install -y nmap
   ```
-- **반드시 대상 시스템에 대한 서면 승인이 있어야 합니다.**
-- OS 탐지 및 일부 스캔 기법에는 root/sudo 권한이 필요합니다.
-- 환경 변수 `SECSKILL_TARGET`: 대상 IP, IP 대역, 또는 호스트명
+- **Written authorization for the target system is required.**
+- OS detection and some scan techniques require root/sudo privileges.
+- Environment variable `SECSKILL_TARGET`: target IP, IP range, or hostname
 
-## 입력
+## Inputs
 
-| 변수 | 필수 | 설명 |
-|------|------|------|
-| `SECSKILL_TARGET` | 필수 | 스캔 대상 (IP, CIDR, 호스트명) |
-| `SECSKILL_OUTPUT_DIR` | 선택 | 결과 저장 디렉터리 (기본: `./output`) |
-| `SECSKILL_SCAN_SPEED` | 선택 | nmap 속도 템플릿 T1-T5 (기본: `T3`) |
-| `SECSKILL_TOP_PORTS` | 선택 | 빠른 스캔 시 검사할 상위 포트 수 (기본: `1000`) |
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SECSKILL_TARGET` | Required | Scan target (IP, CIDR, hostname) |
+| `SECSKILL_OUTPUT_DIR` | Optional | Output directory for results (default: `./output`) |
+| `SECSKILL_SCAN_SPEED` | Optional | nmap speed template T1-T5 (default: `T3`) |
+| `SECSKILL_TOP_PORTS` | Optional | Number of top ports to check in fast scan (default: `1000`) |
 
-## 워크플로우
+## Workflow
 
-### 1단계: 승인 확인 및 환경 준비
+### Step 1: Confirm authorization and prepare environment
 
 ```bash
-export TARGET="${SECSKILL_TARGET:?SECSKILL_TARGET 환경 변수를 설정하세요}"
+export TARGET="${SECSKILL_TARGET:?Set the SECSKILL_TARGET environment variable}"
 export OUTDIR="${SECSKILL_OUTPUT_DIR:-./output}"
 export SPEED="${SECSKILL_SCAN_SPEED:-T3}"
 export TOP_PORTS="${SECSKILL_TOP_PORTS:-1000}"
 mkdir -p "$OUTDIR"
 
 echo "================================================================"
-echo " 경고: 이 스캔은 반드시 승인된 대상에만 수행해야 합니다."
-echo " 무단 스캔은 불법이며 법적 책임이 따릅니다."
+echo " WARNING: This scan must only be performed on authorized targets."
+echo " Unauthorized scanning is illegal and carries legal liability."
 echo "================================================================"
-echo "[*] 스캔 대상: $TARGET"
-echo "[*] 출력 경로: $OUTDIR"
+echo "[*] Scan target: $TARGET"
+echo "[*] Output path: $OUTDIR"
 
 SAFE_NAME=$(echo "$TARGET" | tr '/:' '__')
 ```
 
-### 2단계: 빠른 상위 포트 스캔
+### Step 2: Fast top-port scan
 
 ```bash
-echo "[*] 1단계: 상위 $TOP_PORTS 포트 빠른 스캔 시작..."
+echo "[*] Step 1: Starting fast scan of top $TOP_PORTS ports..."
 nmap -$SPEED \
   --top-ports "$TOP_PORTS" \
   -oN "$OUTDIR/quick_scan_${SAFE_NAME}.txt" \
   -oX "$OUTDIR/quick_scan_${SAFE_NAME}.xml" \
   "$TARGET" 2>/dev/null
 
-echo "[+] 빠른 스캔 완료"
-echo "[*] 발견된 열린 포트:"
+echo "[+] Fast scan complete"
+echo "[*] Discovered open ports:"
 grep "^[0-9].*open" "$OUTDIR/quick_scan_${SAFE_NAME}.txt" | tee /tmp/open_ports.txt
 OPEN_COUNT=$(wc -l < /tmp/open_ports.txt)
-echo "[+] 열린 포트 수: $OPEN_COUNT"
+echo "[+] Open port count: $OPEN_COUNT"
 ```
 
-### 3단계: 상세 서비스 버전 스캔
+### Step 3: Detailed service version scan
 
 ```bash
-# 열린 포트만 추출하여 상세 스캔
+# Extract open ports only for detailed scan
 OPEN_PORTS=$(grep "^[0-9].*open" "$OUTDIR/quick_scan_${SAFE_NAME}.txt" \
   | awk -F'/' '{print $1}' | tr '\n' ',' | sed 's/,$//')
 
 if [ -z "$OPEN_PORTS" ]; then
-  echo "[-] 열린 포트가 없습니다. 스캔을 종료합니다."
+  echo "[-] No open ports found. Exiting scan."
   exit 0
 fi
 
-echo "[*] 2단계: 서비스 버전 상세 스캔 (포트: $OPEN_PORTS)..."
+echo "[*] Step 2: Detailed service version scan (ports: $OPEN_PORTS)..."
 nmap -$SPEED \
   -p "$OPEN_PORTS" \
   -sV \
@@ -103,13 +103,13 @@ nmap -$SPEED \
   -oX "$OUTDIR/service_scan_${SAFE_NAME}.xml" \
   "$TARGET" 2>/dev/null
 
-echo "[+] 서비스 버전 스캔 완료"
+echo "[+] Service version scan complete"
 ```
 
-### 4단계: OS 탐지 (root 권한 필요)
+### Step 4: OS detection (requires root)
 
 ```bash
-echo "[*] 3단계: OS 탐지 시도..."
+echo "[*] Step 3: Attempting OS detection..."
 if [ "$(id -u)" -eq 0 ]; then
   nmap -$SPEED \
     -p "$OPEN_PORTS" \
@@ -119,67 +119,67 @@ if [ "$(id -u)" -eq 0 ]; then
     "$TARGET" 2>/dev/null
 
   OS_INFO=$(grep -iE "OS details:|Aggressive OS guesses:" "$OUTDIR/os_scan_${SAFE_NAME}.txt" | head -3)
-  echo "[+] OS 탐지 결과:"
-  echo "${OS_INFO:-(OS 탐지 실패 - 더 많은 열린 포트가 필요할 수 있음)}"
+  echo "[+] OS detection results:"
+  echo "${OS_INFO:-(OS detection failed - more open ports may be required)}"
 else
-  echo "[-] OS 탐지 건너뜀 (root 권한 필요). sudo 로 재실행하면 사용 가능합니다."
+  echo "[-] OS detection skipped (root required). Re-run with sudo to enable."
 fi
 ```
 
-### 5단계: UDP 주요 서비스 스캔 (선택, root 필요)
+### Step 5: UDP key service scan (optional, requires root)
 
 ```bash
 if [ "$(id -u)" -eq 0 ]; then
-  echo "[*] 4단계: UDP 주요 서비스 스캔 (DNS/SNMP/NTP 등)..."
+  echo "[*] Step 4: UDP key service scan (DNS/SNMP/NTP etc.)..."
   nmap -$SPEED \
     -sU \
     -p 53,67,68,69,123,161,162,500,514,1900 \
     -oN "$OUTDIR/udp_scan_${SAFE_NAME}.txt" \
     "$TARGET" 2>/dev/null
-  echo "[+] UDP 스캔 완료"
+  echo "[+] UDP scan complete"
 else
-  echo "[-] UDP 스캔 건너뜀 (root 권한 필요)"
+  echo "[-] UDP scan skipped (root required)"
 fi
 ```
 
-### 6단계: 결과 요약
+### Step 6: Results summary
 
 ```bash
 echo ""
-echo "===== 포트 스캔 결과 요약 ====="
-echo "대상          : $TARGET"
-echo "열린 포트 수  : $OPEN_COUNT"
+echo "===== Port Scan Results Summary ====="
+echo "Target         : $TARGET"
+echo "Open port count: $OPEN_COUNT"
 echo ""
-echo "[ 서비스 목록 ]"
+echo "[ Service list ]"
 grep "^[0-9].*open" "$OUTDIR/service_scan_${SAFE_NAME}.txt" 2>/dev/null \
   || grep "^[0-9].*open" "$OUTDIR/quick_scan_${SAFE_NAME}.txt"
 echo ""
-echo "결과 파일:"
+echo "Output files:"
 echo "  - $OUTDIR/quick_scan_${SAFE_NAME}.txt"
 echo "  - $OUTDIR/service_scan_${SAFE_NAME}.txt"
-echo "  - $OUTDIR/service_scan_${SAFE_NAME}.xml (구조화 데이터)"
-echo "================================="
+echo "  - $OUTDIR/service_scan_${SAFE_NAME}.xml (structured data)"
+echo "====================================="
 ```
 
-## 완료 조건
+## Done when
 
-- 빠른 스캔 및 서비스 버전 스캔 결과 파일이 생성된다
-- XML 형식의 구조화된 결과 파일이 저장된다
-- 열린 포트 목록과 서비스 정보가 출력된다
+- Fast scan and service version scan result files are created
+- Structured XML result files are saved
+- Open port list and service information are printed
 
-## 실패 모드
+## Failure modes
 
-| 증상 | 원인 | 해결 방법 |
-|------|------|-----------|
-| `nmap: command not found` | 미설치 | `apt-get install nmap` 실행 |
-| 모든 포트 필터됨 | 방화벽 또는 IPS 차단 | `-Pn` 플래그 추가, 다른 스캔 기법 시도 |
-| 스캔이 매우 느림 | 네트워크 지연 또는 T1/T2 속도 | `SECSKILL_SCAN_SPEED=T4` 로 증가 |
-| OS 탐지 실패 | 열린 포트 부족 또는 권한 없음 | sudo 실행, 더 많은 포트 스캔 후 재시도 |
-| 연결 거부 | 대상 오프라인 또는 필터 | `-Pn` 으로 ping 건너뛰기 |
+| Symptom | Cause | Resolution |
+|---------|-------|------------|
+| `nmap: command not found` | Not installed | Run `apt-get install nmap` |
+| All ports filtered | Firewall or IPS blocking | Add `-Pn` flag, try different scan techniques |
+| Scan is very slow | Network latency or T1/T2 speed | Increase with `SECSKILL_SCAN_SPEED=T4` |
+| OS detection failed | Insufficient open ports or no privileges | Run with sudo, retry after scanning more ports |
+| Connection refused | Target offline or filtered | Skip ping with `-Pn` |
 
-## 참고
+## Notes
 
-- **법적 경고**: 무단 포트 스캔은 형사 처벌 대상이 될 수 있습니다. 항상 서면 승인을 받으세요.
-- `-T4` 또는 `-T5`는 IDS/IPS 경보를 유발할 가능성이 높습니다. 스텔스 테스트 시 `-T1` 또는 `-T2`를 사용하세요.
-- XML 출력은 `nuclei-scan` 스킬 및 취약점 관리 플랫폼과 연동할 수 있습니다.
-- NSE 스크립트(`-sC`)는 일부 기본 취약점 점검도 수행합니다 (예: SMB signing, SSL 인증서 정보).
+- **Legal warning**: Unauthorized port scanning may be subject to criminal prosecution. Always obtain written authorization.
+- `-T4` or `-T5` are likely to trigger IDS/IPS alerts. Use `-T1` or `-T2` for stealth testing.
+- XML output can be integrated with the `nuclei-scan` skill and vulnerability management platforms.
+- NSE scripts (`-sC`) also perform some basic vulnerability checks (e.g. SMB signing, SSL certificate info).
