@@ -1,15 +1,52 @@
+# Dependencies
 node_modules/
+.venv/
+venv/
+
+# Build artifacts
 dist/
 build/
+coverage/
+
+# Environment & secrets
 .env
 .env.local
 *.env
 !.env.example
+secrets.env
+credentials.json
+*.pem
+*.key
+!*.key.pub
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Logs & temp
 *.log
-coverage/
-.omc/
+*.tmp
+*.swp
+*~
+
+# Python
 __pycache__/
 *.pyc
-.venv/
-venv/
+*.pyo
+
+# Tool output (scan results may contain sensitive data)
+*.nmap
+*.xml
+*.json.bak
+results/
+output/
+reports/
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Claude Code / OMC
+.omc/
+.claude/
