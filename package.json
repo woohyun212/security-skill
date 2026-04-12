@@ -1,0 +1,26 @@
+{
+  "name": "security-skill",
+  "version": "0.1.0",
+  "private": true,
+  "description": "보안인의, 보안인에 의한, 보안인을 위한 AI 에이전트 스킬 모음집",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "validate": "./scripts/validate-skills.sh",
+    "test": "node scripts/skill-docs.test.js",
+    "ci": "npm run validate && npm run test"
+  },
+  "keywords": [
+    "security",
+    "ai-skills",
+    "claude-code",
+    "pentesting",
+    "cybersecurity",
+    "보안"
+  ]
+}
