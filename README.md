@@ -19,7 +19,7 @@ security-skill/
 └── packages/              # Executable packages for skill dependencies (future)
 ```
 
-## Skill List (49 skills)
+## Skill List (50 skills)
 
 ### Recon (8)
 | Skill | Description |
@@ -76,7 +76,7 @@ security-skill/
 | [`encoding-toolkit`](encoding-toolkit/) | Encoding/decoding conversion (Base64, URL, Hex, etc.) |
 | [`cert-parse`](cert-parse/) | X.509 certificate parsing and chain validation |
 
-### Incident Response (5)
+### Incident Response (6)
 | Skill | Description |
 |-------|-------------|
 | [`ioc-extract`](ioc-extract/) | IOC (Indicator of Compromise) extraction from text |
@@ -84,6 +84,7 @@ security-skill/
 | [`log-analysis`](log-analysis/) | Security log analysis and anomaly detection |
 | [`malware-analysis`](malware-analysis/) | Malware analysis pipeline (static + dynamic + behavioral) |
 | [`siem-rule`](siem-rule/) | SIEM detection rule engineering (Sigma, Splunk, Elastic, Sentinel) |
+| [`mitre-attack-lookup`](mitre-attack-lookup/) | MITRE ATT&CK knowledge base lookup via mitrize |
 
 ### Compliance & Reporting (5)
 | Skill | Description |
@@ -132,6 +133,7 @@ To contribute a new skill, see [docs/contributing.md](docs/contributing.md).
 Skills inspired by and adapted from:
 - [JoasASantos/ClaudeAdvancedPlugins](https://github.com/JoasASantos/ClaudeAdvancedPlugins) — Offensive/defensive security plugins
 - [shuvonsec/claude-bug-bounty](https://github.com/shuvonsec/claude-bug-bounty) — Bug bounty hunting methodology
+- [woohyun212/mitrize](https://github.com/woohyun212/mitrize) — MITRE ATT&CK Markdown knowledge base
 
 ## License
 

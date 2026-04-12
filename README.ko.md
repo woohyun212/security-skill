@@ -19,7 +19,7 @@ security-skill/
 └── packages/              # 스킬이 의존하는 실행 패키지 (향후)
 ```
 
-## 스킬 목록 (49개)
+## 스킬 목록 (50개)
 
 ### 정찰 (8)
 | 스킬 | 설명 |
@@ -76,7 +76,7 @@ security-skill/
 | [`encoding-toolkit`](encoding-toolkit/) | 인코딩/디코딩 변환 (Base64, URL, Hex 등) |
 | [`cert-parse`](cert-parse/) | X.509 인증서 파싱 및 체인 검증 |
 
-### 침해 대응 (5)
+### 침해 대응 (6)
 | 스킬 | 설명 |
 |------|------|
 | [`ioc-extract`](ioc-extract/) | 텍스트에서 IOC(침해 지표) 추출 |
@@ -84,6 +84,7 @@ security-skill/
 | [`log-analysis`](log-analysis/) | 보안 로그 분석 및 이상 탐지 |
 | [`malware-analysis`](malware-analysis/) | 악성코드 분석 파이프라인 (정적 + 동적 + 행위) |
 | [`siem-rule`](siem-rule/) | SIEM 탐지 룰 엔지니어링 (Sigma, Splunk, Elastic, Sentinel) |
+| [`mitre-attack-lookup`](mitre-attack-lookup/) | mitrize 기반 MITRE ATT&CK 지식 베이스 조회 |
 
 ### 컴플라이언스 및 보고 (5)
 | 스킬 | 설명 |
@@ -132,6 +133,7 @@ done
 다음 프로젝트를 참고하여 스킬을 작성하였습니다:
 - [JoasASantos/ClaudeAdvancedPlugins](https://github.com/JoasASantos/ClaudeAdvancedPlugins) — 공격/방어 보안 플러그인
 - [shuvonsec/claude-bug-bounty](https://github.com/shuvonsec/claude-bug-bounty) — 버그 바운티 헌팅 방법론
+- [woohyun212/mitrize](https://github.com/woohyun212/mitrize) — MITRE ATT&CK 마크다운 지식 베이스
 
 ## 라이선스
 
