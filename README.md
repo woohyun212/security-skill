@@ -4,24 +4,42 @@ English | [한국어](README.ko.md)
 
 > By security professionals, of security professionals, for security professionals.
 
-**A security skill collection ready for AI agents to use immediately.**
+**50 security skills for AI agents — copy, install, and start testing.**
 
-Each skill is a single `SKILL.md` markdown file — an instruction set that teaches AI agents (Claude Code, Cursor, Windsurf, etc.) how to use security tools. Execution is delegated to proven, existing security tools (nmap, nuclei, subfinder, etc.).
+Each skill is a `SKILL.md` markdown file that teaches AI agents (Claude Code, Cursor, Windsurf, etc.) how to use security tools. No code to run — skills delegate to proven tools (nmap, nuclei, subfinder, etc.).
 
-## Structure
+## Quick Start
 
+```bash
+# Install all skills to Claude Code
+git clone https://github.com/woohyun212/security-skill.git
+cd security-skill
+for dir in */; do
+  [ -f "$dir/SKILL.md" ] && mkdir -p ~/.claude/skills/"$dir" && cp "$dir/SKILL.md" ~/.claude/skills/"$dir"
+done
 ```
-security-skill/
-├── <skill-name>/          # Skill directory (flat layout at root)
-│   └── SKILL.md           # Skill definition file (the only file)
-├── scripts/               # Validation and utility scripts
-├── docs/                  # Documentation
-└── packages/              # Executable packages for skill dependencies (future)
-```
+
+Then just ask your AI agent naturally:
+
+| You say... | Skill activated |
+|------------|----------------|
+| "Scan example.com for open ports" | `port-scan` |
+| "Find subdomains of example.com" | `subdomain-enum` |
+| "Check this site's SSL certificate" | `ssl-check` |
+| "Run OWASP Top 10 check on this app" | `owasp-check` |
+| "Look up CVE-2024-1234" | `cve-lookup` |
+| "Scan dependencies for vulnerabilities" | `dependency-audit` |
+| "Profile APT28's TTPs in MITRE ATT&CK" | `mitre-attack-lookup` |
+| "Write a pentest report for these findings" | `pentest-report` |
+| "Test this endpoint for SSRF" | `web-vuln-ssrf` |
+| "Build a threat model for our payment API" | `threat-model` |
 
 ## Skill List (50 skills)
 
 ### Recon (8)
+
+> Try: *"Enumerate subdomains of example.com"* · *"Run a port scan on 10.0.0.1"* · *"WHOIS lookup for example.com"*
+
 | Skill | Description |
 |-------|-------------|
 | [`subdomain-enum`](subdomain-enum/) | Subdomain enumeration (subfinder, amass) |
@@ -34,6 +52,9 @@ security-skill/
 | [`cloud-pentest`](cloud-pentest/) | Cloud security testing for AWS, Azure, and GCP |
 
 ### Vulnerability Analysis (5)
+
+> Try: *"Look up CVE-2024-3094"* · *"Scan with nuclei templates"* · *"Audit npm dependencies for vulnerabilities"*
+
 | Skill | Description |
 |-------|-------------|
 | [`cve-lookup`](cve-lookup/) | CVE detailed information lookup (NVD/MITRE) |
@@ -43,6 +64,9 @@ security-skill/
 | [`supply-chain-audit`](supply-chain-audit/) | Software supply chain security with SLSA compliance and SBOM |
 
 ### Web Security (16)
+
+> Try: *"Test this endpoint for SSRF"* · *"Check CORS configuration"* · *"Test OAuth flow for vulnerabilities"*
+
 | Skill | Description |
 |-------|-------------|
 | [`security-headers`](security-headers/) | HTTP security header analysis |
@@ -63,6 +87,9 @@ security-skill/
 | [`llm-ai-security`](llm-ai-security/) | LLM/AI security testing (OWASP ASI01-ASI10) |
 
 ### Authentication & Session (3)
+
+> Try: *"Test MFA bypass on this login"* · *"Check SAML SSO for XSW attacks"* · *"Run AD pentest recon with BloodHound"*
+
 | Skill | Description |
 |-------|-------------|
 | [`web-vuln-saml-sso`](web-vuln-saml-sso/) | SAML/SSO vulnerability detection (XSW attacks) |
@@ -70,6 +97,9 @@ security-skill/
 | [`ad-pentest`](ad-pentest/) | Active Directory penetration testing |
 
 ### Cryptography (3)
+
+> Try: *"Identify this hash type: 5f4dcc3b..."* · *"Decode this base64 string"* · *"Parse this X.509 certificate"*
+
 | Skill | Description |
 |-------|-------------|
 | [`hash-identify`](hash-identify/) | Hash type identification and verification |
@@ -77,6 +107,9 @@ security-skill/
 | [`cert-parse`](cert-parse/) | X.509 certificate parsing and chain validation |
 
 ### Incident Response (6)
+
+> Try: *"Extract IOCs from this log"* · *"Check this hash on VirusTotal"* · *"Map this attack to MITRE ATT&CK"*
+
 | Skill | Description |
 |-------|-------------|
 | [`ioc-extract`](ioc-extract/) | IOC (Indicator of Compromise) extraction from text |
@@ -87,6 +120,9 @@ security-skill/
 | [`mitre-attack-lookup`](mitre-attack-lookup/) | MITRE ATT&CK knowledge base lookup via mitrize |
 
 ### Compliance & Reporting (5)
+
+> Try: *"Run OWASP Top 10 assessment"* · *"Build a threat model using STRIDE"* · *"Write a pentest report"*
+
 | Skill | Description |
 |-------|-------------|
 | [`owasp-check`](owasp-check/) | OWASP Top 10 checklist-based assessment |
@@ -96,6 +132,9 @@ security-skill/
 | [`bug-bounty-validation`](bug-bounty-validation/) | Bug bounty finding validation (7-Question Gate) |
 
 ### Code Security (4)
+
+> Try: *"Security review this pull request"* · *"Set up SAST/DAST pipeline"* · *"Audit this smart contract"*
+
 | Skill | Description |
 |-------|-------------|
 | [`secure-code-review`](secure-code-review/) | Security code review with 10-domain checklist |
@@ -105,21 +144,37 @@ security-skill/
 
 ## Installation
 
-### Claude Code
-```bash
-# Install a single skill
-cp -r subdomain-enum/SKILL.md ~/.claude/skills/subdomain-enum/SKILL.md
+### Claude Code (recommended)
 
-# Install all skills
-for dir in */; do
-  [ -f "$dir/SKILL.md" ] && mkdir -p ~/.claude/skills/"$dir" && cp "$dir/SKILL.md" ~/.claude/skills/"$dir"
-done
+See [Quick Start](#quick-start) above for full install. To install a single skill:
+
+```bash
+# Install one skill
+cp port-scan/SKILL.md ~/.claude/skills/port-scan/SKILL.md
+
+# Then ask: "Scan 10.0.0.1 for open ports"
 ```
 
-### Direct Use
-Read any `SKILL.md` and execute the commands in the workflow section in order.
+### Other AI Agents (Cursor, Windsurf, etc.)
 
-## Skill Authoring Guide
+Copy any `SKILL.md` into your agent's skill/instruction directory, or paste its contents into the system prompt.
+
+### Direct Use
+
+Read any `SKILL.md` and run the commands in the Workflow section step by step.
+
+## Structure
+
+```
+security-skill/
+├── <skill-name>/
+│   ├── SKILL.md           # Skill definition (workflow + instructions)
+│   └── REFERENCE.md       # Optional reference data (tables, templates)
+├── scripts/               # Validation and utility scripts
+└── docs/                  # Documentation
+```
+
+## Contributing
 
 To contribute a new skill, see [docs/contributing.md](docs/contributing.md).
 
