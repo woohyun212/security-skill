@@ -34,7 +34,7 @@ Then just ask your AI agent naturally:
 | "Test this endpoint for SSRF" | `web-vuln-ssrf` |
 | "Build a threat model for our payment API" | `threat-model` |
 
-## Skill List (50 skills)
+## Skill List (58 skills)
 
 ### Recon (8)
 
@@ -96,15 +96,16 @@ Then just ask your AI agent naturally:
 | [`web-vuln-mfa-bypass`](web-vuln-mfa-bypass/) | Multi-factor authentication bypass techniques |
 | [`ad-pentest`](ad-pentest/) | Active Directory penetration testing |
 
-### Cryptography (3)
+### Cryptography (4)
 
-> Try: *"Identify this hash type: 5f4dcc3b..."* · *"Decode this base64 string"* · *"Parse this X.509 certificate"*
+> Try: *"Identify this hash type: 5f4dcc3b..."* · *"Decode this base64 string"* · *"Check this crypto code for timing side-channels"*
 
 | Skill | Description |
 |-------|-------------|
 | [`hash-identify`](hash-identify/) | Hash type identification and verification |
 | [`encoding-toolkit`](encoding-toolkit/) | Encoding/decoding conversion (Base64, URL, Hex, etc.) |
 | [`cert-parse`](cert-parse/) | X.509 certificate parsing and chain validation |
+| [`constant-time-analysis`](constant-time-analysis/) | Timing side-channel detection in cryptographic code |
 
 ### Incident Response (6)
 
@@ -119,9 +120,9 @@ Then just ask your AI agent naturally:
 | [`siem-rule`](siem-rule/) | SIEM detection rule engineering (Sigma, Splunk, Elastic, Sentinel) |
 | [`mitre-attack-lookup`](mitre-attack-lookup/) | MITRE ATT&CK knowledge base lookup via mitrize |
 
-### Compliance & Reporting (5)
+### Compliance & Reporting (6)
 
-> Try: *"Run OWASP Top 10 assessment"* · *"Build a threat model using STRIDE"* · *"Write a pentest report"*
+> Try: *"Run OWASP Top 10 assessment"* · *"Build a threat model using STRIDE"* · *"Verify this code matches the spec"*
 
 | Skill | Description |
 |-------|-------------|
@@ -130,16 +131,23 @@ Then just ask your AI agent naturally:
 | [`threat-model`](threat-model/) | Threat modeling (STRIDE, DREAD, PASTA, Attack Trees) |
 | [`pentest-report`](pentest-report/) | Professional penetration test report writing |
 | [`bug-bounty-validation`](bug-bounty-validation/) | Bug bounty finding validation (7-Question Gate) |
+| [`spec-to-code-compliance`](spec-to-code-compliance/) | Verify code implementation matches security specifications |
 
-### Code Security (4)
+### Code Security (10)
 
-> Try: *"Security review this pull request"* · *"Set up SAST/DAST pipeline"* · *"Audit this smart contract"*
+> Try: *"Security review this PR diff"* · *"Fuzz this parser for crashes"* · *"Audit this Solana contract"*
 
 | Skill | Description |
 |-------|-------------|
 | [`secure-code-review`](secure-code-review/) | Security code review with 10-domain checklist |
+| [`differential-review`](differential-review/) | Security-focused git diff analysis for regressions |
+| [`insecure-defaults`](insecure-defaults/) | Detect weak crypto, fail-open patterns, and unsafe defaults |
 | [`devsecops-pipeline`](devsecops-pipeline/) | CI/CD security pipeline (SAST, SCA, DAST, SBOM) |
 | [`web3-smart-contract`](web3-smart-contract/) | Smart contract audit (10 DeFi vulnerability classes) |
+| [`building-secure-contracts`](building-secure-contracts/) | Multi-chain contract security (Solana, Algorand, Cairo, Cosmos) |
+| [`entry-point-analyzer`](entry-point-analyzer/) | Attack surface mapping via entry point classification |
+| [`property-based-testing`](property-based-testing/) | Property-based fuzzing for crypto and smart contracts |
+| [`testing-handbook`](testing-handbook/) | Fuzzers (AFL++, libFuzzer), sanitizers (ASan/MSan/UBSan), static analysis |
 | [`exploit-chain-building`](exploit-chain-building/) | A-to-B-to-C exploit chain building methodology |
 
 ## Installation
@@ -189,6 +197,7 @@ Skills inspired by and adapted from:
 - [JoasASantos/ClaudeAdvancedPlugins](https://github.com/JoasASantos/ClaudeAdvancedPlugins) — Offensive/defensive security plugins
 - [shuvonsec/claude-bug-bounty](https://github.com/shuvonsec/claude-bug-bounty) — Bug bounty hunting methodology
 - [woohyun212/mitrize](https://github.com/woohyun212/mitrize) — MITRE ATT&CK Markdown knowledge base
+- [Trail of Bits](https://github.com/trailofbits/skills) via [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — Smart contract security, differential review, testing methodology
 
 ## License
 

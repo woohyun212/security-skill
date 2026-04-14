@@ -34,7 +34,7 @@ done
 | "이 엔드포인트에 SSRF 테스트를 해줘" | `web-vuln-ssrf` |
 | "결제 API의 위협 모델을 만들어줘" | `threat-model` |
 
-## 스킬 목록 (50개)
+## 스킬 목록 (58개)
 
 ### 정찰 (8)
 
@@ -96,15 +96,16 @@ done
 | [`web-vuln-mfa-bypass`](web-vuln-mfa-bypass/) | 다중 인증(MFA) 우회 기법 |
 | [`ad-pentest`](ad-pentest/) | Active Directory 침투 테스트 |
 
-### 암호학 (3)
+### 암호학 (4)
 
-> 사용 예시: *"이 해시 타입을 식별해줘: 5f4dcc3b..."* · *"이 base64 문자열을 디코딩해줘"* · *"이 X.509 인증서를 파싱해줘"*
+> 사용 예시: *"이 해시 타입을 식별해줘: 5f4dcc3b..."* · *"이 base64 문자열을 디코딩해줘"* · *"이 암호화 코드에 타이밍 사이드채널이 있는지 확인해줘"*
 
 | 스킬 | 설명 |
 |------|------|
 | [`hash-identify`](hash-identify/) | 해시 타입 식별 및 검증 |
 | [`encoding-toolkit`](encoding-toolkit/) | 인코딩/디코딩 변환 (Base64, URL, Hex 등) |
 | [`cert-parse`](cert-parse/) | X.509 인증서 파싱 및 체인 검증 |
+| [`constant-time-analysis`](constant-time-analysis/) | 암호화 코드의 타이밍 사이드채널 탐지 |
 
 ### 침해 대응 (6)
 
@@ -119,9 +120,9 @@ done
 | [`siem-rule`](siem-rule/) | SIEM 탐지 룰 엔지니어링 (Sigma, Splunk, Elastic, Sentinel) |
 | [`mitre-attack-lookup`](mitre-attack-lookup/) | mitrize 기반 MITRE ATT&CK 지식 베이스 조회 |
 
-### 컴플라이언스 및 보고 (5)
+### 컴플라이언스 및 보고 (6)
 
-> 사용 예시: *"OWASP Top 10 평가를 실행해줘"* · *"STRIDE로 위협 모델을 만들어줘"* · *"침투 테스트 보고서를 작성해줘"*
+> 사용 예시: *"OWASP Top 10 평가를 실행해줘"* · *"STRIDE로 위협 모델을 만들어줘"* · *"이 코드가 스펙과 일치하는지 검증해줘"*
 
 | 스킬 | 설명 |
 |------|------|
@@ -130,16 +131,23 @@ done
 | [`threat-model`](threat-model/) | 위협 모델링 (STRIDE, DREAD, PASTA, Attack Trees) |
 | [`pentest-report`](pentest-report/) | 전문 침투 테스트 보고서 작성 |
 | [`bug-bounty-validation`](bug-bounty-validation/) | 버그 바운티 발견 사항 검증 (7-Question Gate) |
+| [`spec-to-code-compliance`](spec-to-code-compliance/) | 보안 스펙 대비 코드 구현 준수 검증 |
 
-### 코드 보안 (4)
+### 코드 보안 (10)
 
-> 사용 예시: *"이 PR을 보안 리뷰해줘"* · *"SAST/DAST 파이프라인을 설정해줘"* · *"이 스마트 컨트랙트를 감사해줘"*
+> 사용 예시: *"이 PR diff를 보안 리뷰해줘"* · *"이 파서를 퍼징해줘"* · *"이 Solana 컨트랙트를 감사해줘"*
 
 | 스킬 | 설명 |
 |------|------|
 | [`secure-code-review`](secure-code-review/) | 10개 도메인 보안 코드 리뷰 |
+| [`differential-review`](differential-review/) | git diff 기반 보안 변경 사항 분석 |
+| [`insecure-defaults`](insecure-defaults/) | 취약한 암호화, fail-open 패턴, 안전하지 않은 기본값 탐지 |
 | [`devsecops-pipeline`](devsecops-pipeline/) | CI/CD 보안 파이프라인 (SAST, SCA, DAST, SBOM) |
 | [`web3-smart-contract`](web3-smart-contract/) | 스마트 컨트랙트 감사 (10가지 DeFi 취약점 클래스) |
+| [`building-secure-contracts`](building-secure-contracts/) | 멀티체인 컨트랙트 보안 (Solana, Algorand, Cairo, Cosmos) |
+| [`entry-point-analyzer`](entry-point-analyzer/) | 진입점 분류를 통한 공격 표면 매핑 |
+| [`property-based-testing`](property-based-testing/) | 암호화 및 스마트 컨트랙트를 위한 속성 기반 퍼징 |
+| [`testing-handbook`](testing-handbook/) | 퍼저 (AFL++, libFuzzer), 새니타이저 (ASan/MSan/UBSan), 정적 분석 |
 | [`exploit-chain-building`](exploit-chain-building/) | A→B→C 익스플로잇 체인 빌딩 방법론 |
 
 ## 설치
@@ -189,6 +197,7 @@ security-skill/
 - [JoasASantos/ClaudeAdvancedPlugins](https://github.com/JoasASantos/ClaudeAdvancedPlugins) — 공격/방어 보안 플러그인
 - [shuvonsec/claude-bug-bounty](https://github.com/shuvonsec/claude-bug-bounty) — 버그 바운티 헌팅 방법론
 - [woohyun212/mitrize](https://github.com/woohyun212/mitrize) — MITRE ATT&CK 마크다운 지식 베이스
+- [Trail of Bits](https://github.com/trailofbits/skills) via [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — 스마트 컨트랙트 보안, 차등 리뷰, 테스팅 방법론
 
 ## 라이선스
 
