@@ -1,6 +1,6 @@
 ---
 name: web-vuln-idor
-description: IDOR vulnerability detection with V1-V8 variant classification and chain escalation paths
+description: IDOR testing across numeric IDs, UUIDs, GraphQL, WebSocket, API versioning, and mass assignment vectors
 license: MIT
 metadata:
   category: web-security
@@ -287,22 +287,7 @@ done
 ```bash
 echo "=== Impact Assessment and Chain Escalation ==="
 
-# After confirming IDOR, assess escalation potential
-cat <<'EOF'
-IDOR Impact Classification:
-  Read PII (name, email, address)         -> Medium
-  Read financial data (orders, payments)  -> High
-  Write/modify another user's data        -> High
-  Change another user's email/password    -> Critical (ATO)
-  Access admin endpoint                   -> Critical (privilege escalation)
-
-Chain escalation paths:
-  IDOR + read email address  -> phishing / credential stuffing
-  IDOR + write email field   -> ATO (change victim email, trigger password reset)
-  IDOR + admin endpoint      -> escalate to admin ATO
-  IDOR + PII at scale        -> prove mass data exposure (loop 20 IDs)
-  IDOR + chatbot context     -> AI reads other users' conversation history
-EOF
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for IDOR impact classification levels and chain escalation paths.
 
 # Prove scale: enumerate 20 sequential IDs to show mass impact
 echo ""

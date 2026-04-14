@@ -96,6 +96,7 @@ Probe each CNAME-bearing subdomain over HTTP/HTTPS and look for service-specific
 echo "[*] Probing CNAME subdomains for takeover fingerprints..."
 
 # Fingerprint database: service name -> response string indicating unclaimed resource
+# See REFERENCE.md for the full fingerprint table.
 declare -A FINGERPRINTS
 FINGERPRINTS["github-pages"]="There isn't a GitHub Pages site here"
 FINGERPRINTS["s3"]="NoSuchBucket"
@@ -202,15 +203,7 @@ echo "$CANDIDATE_CNAME" | grep -oE "(github\.io|s3\.amazonaws\.com|herokuapp\.co
 
 Service-specific claim verification:
 
-| Service | CNAME pattern | Claim check |
-|---------|--------------|-------------|
-| GitHub Pages | `*.github.io` | Try creating `github.com/<username>/<cname-prefix>` repo with `gh-pages` branch |
-| AWS S3 | `*.s3.amazonaws.com` or `s3-*.amazonaws.com` | Try `aws s3 mb s3://<bucket-name>` in the appropriate region |
-| Heroku | `*.herokuapp.com` | Try `heroku create <app-name>` |
-| Netlify | `*.netlify.app` | Try creating a Netlify site with the matching custom domain |
-| Azure Traffic Manager | `*.trafficmanager.net` | Try creating an Azure Traffic Manager profile with the name |
-| Shopify | `*.myshopify.com` (via custom domain) | Check if the Shopify store name is available |
-| Fastly | Any domain with Fastly 422 | Check if the CNAME hostname is registered as a Fastly service domain |
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for the service-specific claim verification table.
 
 ### Step 7: Attempt claim (authorized testing only)
 

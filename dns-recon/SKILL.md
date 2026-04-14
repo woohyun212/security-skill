@@ -5,7 +5,7 @@ license: MIT
 metadata:
   category: recon
   locale: en
-  phase: recon
+  phase: v1
 ---
 
 ## What this skill does

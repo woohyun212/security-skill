@@ -88,35 +88,9 @@ echo "$HEADERS_ATTACK" | grep -iE "server:|cf-ray:|x-amz|x-cache|x-sucuri|x-iinf
 
 ### Step 4: Compare against known WAF fingerprint patterns
 
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for the WAF fingerprint pattern table (6 WAF products with header signatures and block responses).
+
 ```bash
-echo ""
-echo "=== WAF fingerprint pattern reference ==="
-cat <<'EOF'
-Cloudflare
-  Headers: CF-RAY, Server: cloudflare
-  Block response: 403/503 + "Cloudflare" in body, "__cf_bm" cookie
-
-AWS WAF
-  Headers: x-amzn-requestid, x-amz-cf-id
-  Block response: 403 + "AWS" or "Request blocked"
-
-Akamai
-  Headers: X-Check-Cacheable, X-Akamai-*, Server: AkamaiGHost
-  Block response: 403 + Reference #
-
-F5 BIG-IP ASM
-  Headers: X-WA-Info, Set-Cookie: TS (cookie starting with TS)
-  Block response: policy block page
-
-Sucuri
-  Headers: X-Sucuri-ID, Server: Sucuri/Cloudproxy
-  Block response: 403 + Sucuri logo page
-
-ModSecurity (open source)
-  Headers: mod_security in Server header or no special header
-  Block response: 403 + "ModSecurity" in body or custom error page
-EOF
-
 echo ""
 echo "=== Detection summary ==="
 echo "Normal response code: $(echo "$NORMAL" | grep "^HTTP" | awk '{print $2}')"

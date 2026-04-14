@@ -1,6 +1,6 @@
 ---
 name: web-vuln-http-smuggling
-description: HTTP request smuggling detection for CL.TE, TE.CL, and H2.CL variants
+description: HTTP request smuggling (desync) detection in proxy/CDN architectures testing CL.TE, TE.CL, TE.TE, and H2.CL parser disagreements
 license: MIT
 metadata:
   category: web-security
@@ -50,13 +50,10 @@ curl -s -I "https://$TARGET_HOST$TARGET_PATH" | grep -iE "via|x-cache|x-served-b
 
 echo ""
 echo "Indicators of proxy presence:"
-echo "  Via: 1.1 vegur          -> Heroku"
-echo "  X-Cache: HIT            -> Caching layer present"
-echo "  CF-Ray:                 -> Cloudflare"
-echo "  X-Amz-Cf-Id:            -> AWS CloudFront"
-echo "  X-Served-By:            -> Fastly/Varnish"
-echo "  Server: nginx + X-Powered-By: Express  -> Nginx front + Node back"
+echo "  See REFERENCE.md for proxy fingerprinting header-to-vendor mappings"
 ```
+
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for proxy fingerprinting indicators (header-to-vendor mappings).
 
 ### Step 2: Test CL.TE with timing probe
 
@@ -219,26 +216,10 @@ echo "     the smuggled prefix was prepended to it — smuggling confirmed"
 ```bash
 echo ""
 echo "=== Impact assessment ==="
-cat <<'EOF'
-HTTP smuggling impact chains:
-
-  Request hijacking        -> Critical  Prepend smuggled request to victim's next
-                                        request -> steal their session/credentials
-  WAF bypass               -> High      Smuggle a request that bypasses the WAF's
-                                        inspection of the "real" request body
-  Cache poisoning          -> High      Poison a cacheable response with attacker
-                                        content -> stored XSS at scale
-  Credential theft         -> Critical  Smuggle a GET to a page that reflects a
-                                        request header containing victim cookies
-
-Variant severity mapping:
-  CL.TE confirmed          -> Critical (lowest dup rate, highest payout)
-  TE.CL confirmed          -> Critical
-  TE.TE confirmed          -> High/Critical (depends on exploitability)
-  H2.CL confirmed          -> Critical (modern stacks, often unpatched)
-  Timing signal only       -> Medium   (submit with timing evidence, note unconfirmed)
-EOF
+echo "See REFERENCE.md for impact chains and variant severity mappings"
 ```
+
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for impact assessment — impact chains (request hijacking, WAF bypass, cache poisoning, credential theft) and severity mappings by variant.
 
 ## Done when
 

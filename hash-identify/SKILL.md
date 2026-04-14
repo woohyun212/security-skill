@@ -59,31 +59,7 @@ hashid "$HASH_VALUE" -m 2>&1
 
 ### Step 3: Common hash length reference table
 
-```bash
-echo ""
-echo "=== Common hash length reference table ==="
-python3 - <<'PYEOF'
-import hashlib
-
-samples = {
-    "MD5":       hashlib.md5(b"test").hexdigest(),
-    "SHA-1":     hashlib.sha1(b"test").hexdigest(),
-    "SHA-224":   hashlib.sha224(b"test").hexdigest(),
-    "SHA-256":   hashlib.sha256(b"test").hexdigest(),
-    "SHA-384":   hashlib.sha384(b"test").hexdigest(),
-    "SHA-512":   hashlib.sha512(b"test").hexdigest(),
-    "SHA3-256":  hashlib.sha3_256(b"test").hexdigest(),
-    "SHA3-512":  hashlib.sha3_512(b"test").hexdigest(),
-    "BLAKE2b":   hashlib.blake2b(b"test").hexdigest(),
-    "BLAKE2s":   hashlib.blake2s(b"test").hexdigest(),
-}
-
-print(f"{'Algorithm':<12} {'Length(hex)':<10} {'Example (partial)'}")
-print("-" * 55)
-for name, h in samples.items():
-    print(f"{name:<12} {len(h):<10} {h[:24]}...")
-PYEOF
-```
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for the hash length reference table and verification candidate mapping.
 
 ### Step 4: (Optional) Verify hash against plaintext
 

@@ -1,6 +1,6 @@
 ---
 name: llm-ai-security
-description: LLM and AI application security testing using OWASP ASI01-ASI10 framework
+description: LLM/AI application security testing for prompt injection, system prompt leakage, tool abuse, and output handling per OWASP AI Security Top 10
 license: MIT
 metadata:
   category: web-security

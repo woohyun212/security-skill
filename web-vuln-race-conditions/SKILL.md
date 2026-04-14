@@ -1,6 +1,6 @@
 ---
 name: web-vuln-race-conditions
-description: Race condition vulnerability detection including TOCTOU and double-spend attacks
+description: Web endpoint race condition testing (TOCTOU, coupon reuse, double-spend, limit overrun) using concurrent HTTP request bursts
 license: MIT
 metadata:
   category: web-security

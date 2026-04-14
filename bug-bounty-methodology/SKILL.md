@@ -1,6 +1,6 @@
 ---
 name: bug-bounty-methodology
-description: Bug bounty hunting methodology with 5-phase non-linear workflow and developer psychology analysis
+description: Guided bug bounty hunting session with recon, mapping, discovery, exploitation, and reporting phases with escalation routing
 license: MIT
 metadata:
   category: web-security
@@ -137,6 +137,7 @@ curl -sk "https://$TARGET/api/me" -H "Authorization: Bearer INVALID" \
 # 3. Complex flows (coupon + points + refund) have edge case bugs
 
 # Decision flow: what are you testing?
+# See REFERENCE.md for the full decision flow routing table (input types to vuln classes).
 # ID parameter (user_id, order_id) -> test IDOR (use web-vuln-idor skill)
 # URL/webhook input                -> test SSRF (use web-vuln-ssrf skill)
 # Price/quantity/coupon            -> test business logic (use web-vuln-business-logic skill)
@@ -178,6 +179,7 @@ done
 
 ```bash
 # Escalation decision by finding type:
+# See REFERENCE.md for the full escalation decision tree (finding types to attack chains).
 # XSS found          -> steal cookie/token -> session hijack -> ATO
 # IDOR found         -> read PII or write data -> chain to ATO
 # SSRF found         -> reach cloud metadata -> extract IAM keys -> RCE
@@ -214,6 +216,8 @@ done
 
 ### Step 6: Time management — rotation rules
 
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for time-management rotation rules and anti-pattern advice.
+
 ```bash
 # Session timer — print rotation reminders
 SESSION_START=$(date +%s)
@@ -225,12 +229,6 @@ check_time() {
   [ $elapsed -ge 45 ] && echo "45-MIN RULE: STOP. Rabbit hole detected. Move on."
 }
 # Call check_time after each testing block
-
-# Anti-patterns to avoid:
-# - Program hopping: stick with one target minimum 30 hours
-# - Tool-only hunting: automation finds duplicates, manual finds unique bugs
-# - No goal: always define BB_SESSION_GOAL before starting
-# - Ignoring "weird" behaviors: log anomalies even if not immediately exploitable
 echo "Session started at $(date). Goal: ${BB_SESSION_GOAL}. Focus: ${BB_VULN_CLASS}."
 ```
 

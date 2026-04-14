@@ -1,6 +1,6 @@
 ---
 name: encoding-toolkit
-description: Encode and decode strings across Base64, URL, Hex, HTML entities, ROT13, and JWT formats
+description: Encode/decode strings (Base64, URL, Hex, HTML, ROT13, JWT) for payload transformation, WAF bypass, and encoded data analysis
 license: MIT
 metadata:
   category: crypto

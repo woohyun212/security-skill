@@ -5,7 +5,9 @@ A collection of security skills for AI agents. Each skill is a markdown instruct
 
 ## Skill Rules
 - Skill directories are placed flat at the root (no nesting)
-- Each skill directory contains only one `SKILL.md`
+- Each skill directory contains `SKILL.md` and an optional `REFERENCE.md`
+- `REFERENCE.md` holds lookup tables, templates, checklists, and other static reference data
+- `SKILL.md` should stay under 400 lines — extract heavy reference material to `REFERENCE.md`
 - The `name:` frontmatter in `SKILL.md` must match the directory name exactly
 - Skills delegate execution to existing security tools (nmap, nuclei, subfinder, etc.)
 - Skills must not contain executable source code
@@ -34,7 +36,8 @@ npm test                       # Documentation convention tests
 ```
 
 ## Directory Structure
-- `<skill-name>/SKILL.md` — skill definition
+- `<skill-name>/SKILL.md` — skill definition (workflow and instructions)
+- `<skill-name>/REFERENCE.md` — optional reference data (tables, templates, checklists)
 - `scripts/` — validation and utilities
 - `docs/` — documentation
 - `packages/` — future npm packages

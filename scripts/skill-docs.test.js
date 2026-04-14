@@ -33,6 +33,16 @@ for (const dir of dirs) {
   const skillPath = path.join(REPO_ROOT, dir.name, "SKILL.md");
   if (!fs.existsSync(skillPath)) continue;
 
+  // Validate only allowed files exist in skill directory
+  const files = fs.readdirSync(path.join(REPO_ROOT, dir.name));
+  const allowedFiles = new Set(["SKILL.md", "REFERENCE.md"]);
+  for (const f of files) {
+    if (!allowedFiles.has(f)) {
+      console.error(`FAIL: ${dir.name}/ — unexpected file '${f}'`);
+      errors++;
+    }
+  }
+
   checked++;
   const content = fs.readFileSync(skillPath, "utf-8");
 

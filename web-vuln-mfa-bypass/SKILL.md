@@ -1,6 +1,6 @@
 ---
 name: web-vuln-mfa-bypass
-description: Multi-factor authentication bypass techniques and detection
+description: MFA bypass testing covering rate limiting, OTP reuse, response manipulation, race conditions, and direct navigation attacks
 license: MIT
 metadata:
   category: web-security
@@ -319,30 +319,13 @@ echo "  If MFA state stored client-side without server-side validation -> set to
 
 ### Step 10: Document bypass and impact
 
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for severity guide (9 classifications) and remediation checklist.
+
 ```bash
 echo ""
 echo "=== Step 10: Summary ==="
-cat <<'EOF'
-Severity guide:
-  [CRITICAL] Direct page navigation bypasses MFA -> complete authentication bypass
-  [CRITICAL] Response manipulation accepted by server -> MFA bypass for any account
-  [HIGH]     No rate limiting on OTP -> brute force of 6-digit TOTP feasible (1,000,000 combinations)
-  [HIGH]     OTP reuse allowed -> stolen OTP valid multiple times
-  [HIGH]     Race condition -> concurrent requests allow OTP use before invalidation
-  [HIGH]     MFA can be disabled without re-verification -> social engineering + MFA removal
-  [MEDIUM]   Backup codes not rate-limited -> slow brute force possible
-  [MEDIUM]   MFA state stored in client-side cookie without integrity check
-  [LOW]      Predictable/default OTP values accepted
-
-Remediation:
-  - Enforce server-side rate limiting (5-10 attempts max) with exponential backoff on OTP endpoint
-  - Invalidate OTP immediately upon first use; reject replay within the same TOTP window
-  - Validate MFA completion server-side before granting access to any post-MFA resource
-  - Use optimistic locking or atomic server-side state transitions to prevent race conditions
-  - Require current password or valid OTP before allowing MFA disable/change
-  - Never store MFA state in client-side cookies or localStorage
-  - Apply same rate limiting to backup codes as to primary OTP
-EOF
+echo "Classify findings using the severity guide in REFERENCE.md"
+echo "Apply remediation steps from REFERENCE.md to address identified weaknesses"
 ```
 
 ## Done when

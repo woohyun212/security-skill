@@ -28,6 +28,20 @@ for dir in "$REPO_ROOT"/*/; do
     continue
   fi
 
+  # 허용된 파일만 존재하는지 확인 (SKILL.md + optional REFERENCE.md)
+  for f in "$dir"/*; do
+    fname="$(basename "$f")"
+    if [ "$fname" != "SKILL.md" ] && [ "$fname" != "REFERENCE.md" ]; then
+      echo "WARN: $dirname/ — unexpected file '$fname' (only SKILL.md and REFERENCE.md allowed)"
+    fi
+  done
+
+  # SKILL.md 라인 수 경고
+  line_count="$(wc -l < "$skill_file")"
+  if [ "$line_count" -gt 400 ]; then
+    echo "WARN: $dirname/SKILL.md — $line_count lines (recommended: ≤400). Consider extracting to REFERENCE.md"
+  fi
+
   # YAML 프론트매터 시작 여부
   first_line="$(head -n 1 "$skill_file")"
   if [ "$first_line" != "---" ]; then

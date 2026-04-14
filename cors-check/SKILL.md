@@ -108,29 +108,7 @@ curl -s -I -X OPTIONS "$TARGET_URL" \
 
 ### Step 4: Summarize results and assess risk
 
-```bash
-echo ""
-echo "=== Risk assessment criteria ==="
-cat <<'EOF'
-[CRITICAL]  ACAO reflects request Origin + ACAC: true
-            -> Attacker can execute authenticated API requests cross-site
-
-[HIGH]      ACAO: null + ACAC: true
-            -> Exploitable from sandboxed iframes or local files
-
-[MEDIUM]    ACAO reflects request Origin (no ACAC)
-            -> Dangerous if the response contains sensitive data
-
-[LOW/INFO]  ACAO: * (wildcard, no ACAC)
-            -> May be intentional for public APIs
-
-Remediation:
-  - Fix allowed Origins to a whitelist (no dynamic reflection)
-  - Do not use wildcard (*) when credentials=true
-  - Disallow null Origin
-  - Add Vary: Origin header (prevents cache poisoning)
-EOF
-```
+> **Reference**: See [REFERENCE.md](REFERENCE.md) for risk assessment criteria (4 severity levels plus remediation guidance).
 
 ## Done when
 

@@ -5,7 +5,7 @@ license: MIT
 metadata:
   category: vuln-analysis
   locale: en
-  phase: vuln-analysis
+  phase: v1
 ---
 
 ## What this skill does
