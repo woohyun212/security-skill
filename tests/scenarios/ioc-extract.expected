@@ -1,0 +1,9 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+|IPv4|ipv4"
+PATTERN_2="domain|Domain|IOC|ioc"
+PATTERN_3="MD5|SHA1|SHA256|hash|Hash"
+PATTERN_4="IOC Extraction Report|IOCs extracted|Total [0-9]+"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="command not found|permission denied|fatal error"
+ANTIPATTERN_2="Input collected: 0 bytes"

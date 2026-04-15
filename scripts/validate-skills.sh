@@ -4,7 +4,7 @@ set -euo pipefail
 # validate-skills.sh — 모든 스킬 디렉토리의 SKILL.md 유효성 검증
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SKIP_DIRS=".git .github .omc docs scripts packages python-packages node_modules"
+SKIP_DIRS=".git .github .omc .research docs scripts packages python-packages node_modules tests"
 errors=0
 checked=0
 

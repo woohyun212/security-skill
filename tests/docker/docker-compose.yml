@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    ports: ["8081:80"]
+    environment:
+      MYSQL_ROOT_PASSWORD: dvwa
+
+  juice-shop:
+    image: bkimminich/juice-shop:latest
+    ports: ["3000:3000"]
+
+  nginx-misconfig:
+    build: ./nginx-misconfig
+    ports: ["8082:80", "8443:443"]
+
+  graphql-dvga:
+    image: dolevf/dvga:latest
+    ports: ["5013:5013"]
+    environment:
+      WEB_HOST: "0.0.0.0"
+
+  ssti-app:
+    build: ./ssti-app
+    ports: ["5000:5000"]
+
+  dns-server:
+    image: internetsystemsconsortium/bind9:9.18
+    ports: ["5353:53/tcp", "5353:53/udp"]
+    volumes:
+      - ./dns-zone:/etc/bind
+
+  git-repo:
+    build: ./git-repo
+    volumes:
+      - git-repo-data:/repo
+
+  mock-api:
+    build: ./mock-api
+    ports: ["8083:3000"]
+
+  log-source:
+    build: ./log-source
+    volumes:
+      - log-data:/logs
+
+volumes:
+  git-repo-data:
+  log-data:

@@ -1,0 +1,4 @@
+# Don't commit container data
+*/data/
+*.pem
+*.key

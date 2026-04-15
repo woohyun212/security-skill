@@ -37,9 +37,18 @@ Inspects security controls of a target application against the OWASP Top 10 2021
 ### Step 1: Collect target application information
 
 ```bash
-read -rp "Application name: " APP_NAME
-read -rp "Type (web/api/mobile): " APP_TYPE
-read -rp "Tech stack (e.g. Node.js, PostgreSQL): " TECH_STACK
+APP_NAME="${SECSKILL_APP_NAME:-}"
+if [ -z "$APP_NAME" ]; then
+  read -rp "Application name: " APP_NAME
+fi
+APP_TYPE="${SECSKILL_APP_TYPE:-}"
+if [ -z "$APP_TYPE" ]; then
+  read -rp "Type (web/api/mobile): " APP_TYPE
+fi
+TECH_STACK="${SECSKILL_TECH_STACK:-}"
+if [ -z "$TECH_STACK" ]; then
+  read -rp "Tech stack (e.g. Node.js, PostgreSQL): " TECH_STACK
+fi
 
 REPORT_FILE="/tmp/owasp_check_$(date +%Y%m%d_%H%M%S).md"
 echo "# OWASP Top 10 2021 Inspection Results" > "$REPORT_FILE"

@@ -1,0 +1,8 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="example\.com|certificate|issuer"
+PATTERN_2="Certificates found|Unique subdomains|Certificate Transparency"
+PATTERN_3="Wildcard Certificate|Certificate Issuer|crt\.sh"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="crt\.sh API error|HTTP 5[0-9][0-9]|curl.*failed"
+ANTIPATTERN_2="Set the SECSKILL_TARGET_DOMAIN environment variable"

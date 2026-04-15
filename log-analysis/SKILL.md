@@ -38,9 +38,9 @@ Analyzes security log files to detect anomalies. Extracts top IPs, paths, status
 ### Step 1: Verify log file and type
 
 ```bash
-LOG_FILE="${1:-}"
-LOG_TYPE="${2:-auto}"
-TOP_N="${3:-20}"
+LOG_FILE="${SECSKILL_LOG_FILE:-${1:-}}"
+LOG_TYPE="${SECSKILL_LOG_TYPE:-${2:-auto}}"
+TOP_N="${SECSKILL_TOP_N:-${3:-20}}"
 
 if [ -z "$LOG_FILE" ]; then
     read -rp "Enter log file path: " LOG_FILE

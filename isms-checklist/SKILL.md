@@ -38,15 +38,24 @@ Inspects control items against the ISMS-P (Information Security and Personal Inf
 ### Step 1: Configure the inspection environment
 
 ```bash
-read -rp "Organization name: " ORG_NAME
+ORG_NAME="${SECSKILL_ORG_NAME:-}"
+if [ -z "$ORG_NAME" ]; then
+  read -rp "Organization name: " ORG_NAME
+fi
 echo ""
 echo "Select the domain(s) to inspect:"
 echo "  1) Management System Establishment and Operation (관리체계 수립 및 운영) - 16 controls"
 echo "  2) Protection Measure Requirements (보호대책 요구사항) - 64 controls"
 echo "  3) Personal Information Processing Stage Requirements (개인정보 처리 단계별 요구사항) - 22 controls"
 echo "  all) All domains - 102 controls"
-read -rp "Selection [1/2/3/all]: " DOMAIN_SEL
-read -rp "Certification scope (optional): " SCOPE
+DOMAIN_SEL="${SECSKILL_DOMAIN_SEL:-}"
+if [ -z "$DOMAIN_SEL" ]; then
+  read -rp "Selection [1/2/3/all]: " DOMAIN_SEL
+fi
+SCOPE="${SECSKILL_SCOPE:-}"
+if [ -z "$SCOPE" ]; then
+  read -rp "Certification scope (optional): " SCOPE
+fi
 
 REPORT_FILE="/tmp/isms_check_$(date +%Y%m%d_%H%M%S).md"
 cat > "$REPORT_FILE" <<EOF

@@ -1,0 +1,8 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="SBOM|CycloneDX|SPDX|syft"
+PATTERN_2="trivy|vulnerability|Supply Chain Audit"
+PATTERN_3="SLSA|lockfile|Ecosystems detected|audit complete"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="Set SECSKILL_REPO_PATH|command not found"
+ANTIPATTERN_2="fatal error|panic"

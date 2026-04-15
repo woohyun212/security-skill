@@ -1,0 +1,8 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="nuclei|templates|Nuclei scan"
+PATTERN_2="vulnerability|info|low|medium|high|critical|finding|No vulnerabilities found"
+PATTERN_3="Scan complete|Nuclei Scan Result Summary|Severity filter"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="nuclei: command not found|command not found"
+ANTIPATTERN_2="Set either SECSKILL_TARGET or SECSKILL_TARGET_LIST"

@@ -1,0 +1,8 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="password|PASSWORD|MD5|SHA1|DES"
+PATTERN_2="debug.*[Tt]rue|DEBUG.*True|default.*credential|hardcoded"
+PATTERN_3="Insecure Defaults Scan|Risk Summary|Weak [Cc]rypto"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="command not found|permission denied|fatal error"
+ANTIPATTERN_2="Directory not found"

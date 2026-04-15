@@ -1,0 +1,8 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="T1059|Command and Scripting Interpreter"
+PATTERN_2="[Ee]xecution|tactic|Tactic"
+PATTERN_3="technique|Technique|ATT&CK"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="command not found|permission denied|fatal error"
+ANTIPATTERN_2="FileNotFoundError|repo not found|not cloned"

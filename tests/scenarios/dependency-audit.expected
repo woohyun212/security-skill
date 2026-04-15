@@ -1,0 +1,8 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="vulnerability|CVE|Dependency Audit"
+PATTERN_2="lodash|requests|npm audit|pip-audit|trivy"
+PATTERN_3="Total vulnerabilities|findings|audit complete"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="Path not found|command not found"
+ANTIPATTERN_2="Set the SECSKILL_PROJECT_PATH environment variable"

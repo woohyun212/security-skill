@@ -1,0 +1,8 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="Certificate Information|subject=|issuer="
+PATTERN_2="TLS 1\.[0-9]|Protocol Support|\[ENABLED\]|\[DISABLED\]"
+PATTERN_3="Cipher is|Negotiated Cipher Suite|cipher"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="command not found|permission denied|fatal error"
+ANTIPATTERN_2="connect: Connection refused"

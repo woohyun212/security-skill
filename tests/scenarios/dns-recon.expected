@@ -1,0 +1,8 @@
+# Patterns that MUST match (grep -E, all must match for PASS)
+PATTERN_1="A record|CNAME|MX|NS|TXT|SOA|--- A record ---"
+PATTERN_2="test\.security-skill\.local"
+PATTERN_3="DNS recon|DNS Record Query|Starting DNS recon"
+
+# Patterns that must NOT match (any match = FAIL)
+ANTIPATTERN_1="command not found|dig: command not found"
+ANTIPATTERN_2="Set the SECSKILL_TARGET_DOMAIN environment variable"
