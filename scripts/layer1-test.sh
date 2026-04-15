@@ -75,10 +75,24 @@ test_skill() {
   set -u
 
   # Extract substituted commands and execute them; capture combined stdout+stderr
+  # If SECSKILL_INPUT points to a file and skill reads from stdin, pipe it in
   local output
-  output=$(
-    "$REPO_ROOT/scripts/extract-commands.sh" "$skill_md" "$env_file" 2>&1 | bash 2>&1
-  ) || true
+  local stdin_file=""
+  if [[ -n "${SECSKILL_INPUT:-}" ]] && [[ -f "${SECSKILL_INPUT:-}" ]]; then
+    stdin_file="$SECSKILL_INPUT"
+  fi
+
+  local skill_timeout="${SECSKILL_TIMEOUT:-120}"
+
+  if [[ -n "$stdin_file" ]]; then
+    output=$(
+      timeout "$skill_timeout" bash -c "$("$REPO_ROOT/scripts/extract-commands.sh" "$skill_md" "$env_file" 2>&1)" 2>&1 < "$stdin_file"
+    ) || true
+  else
+    output=$(
+      timeout "$skill_timeout" bash -c "$("$REPO_ROOT/scripts/extract-commands.sh" "$skill_md" "$env_file" 2>&1)" 2>&1
+    ) || true
+  fi
 
   # Load expected patterns into an isolated subshell to avoid polluting current env,
   # then export each PATTERN_* / ANTIPATTERN_* we find.

@@ -1,4 +1,1 @@
-PATTERN_1="diff|Diff|README|auth\.py|\.env"
-PATTERN_2="commit|@@|\+|\-"
-ANTIPATTERN_1="command not found|permission denied"
-ANTIPATTERN_2="Set the SECSKILL_"
+PATTERN_1="diff --git|diff|@@|\+|\-"

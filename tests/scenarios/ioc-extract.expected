@@ -1,4 +1,1 @@
-PATTERN_1="185\.220\.101\.1|10\.0\.0\.1|malicious\.example\.com"
-PATTERN_2="curl|iptables|DROP|beacon"
-ANTIPATTERN_1="command not found|permission denied"
-ANTIPATTERN_2="Set the SECSKILL_"
+PATTERN_1="Paste text|ioc|IOC|regex|Input collected"

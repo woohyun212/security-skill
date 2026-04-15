@@ -59,6 +59,10 @@ substitute_vars() {
     line="${line//\$\{$key\}/$val}"
     line="${line//\$\{$key:?*\}/$val}"
     line="${line//\$\{$key:-*\}/$val}"
+    # Also replace <PLACEHOLDER> style markers (e.g., <BASE_REF> -> env value)
+    # Map SECSKILL_BASE_REF -> <BASE_REF>, SECSKILL_HEAD_REF -> <HEAD_REF>, etc.
+    local placeholder="${key#SECSKILL_}"  # strip prefix
+    line="${line//<$placeholder>/$val}"
   done
   echo "$line"
 }
