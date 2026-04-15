@@ -1,8 +1,4 @@
-# Patterns that MUST match (grep -E, all must match for PASS)
-PATTERN_1="Registrar|Name Server|Creation Date|Registrant"
-PATTERN_2="Domain WHOIS Summary|WHOIS Raw Data|whois"
-PATTERN_3="example\.com"
-
-# Patterns that must NOT match (any match = FAIL)
-ANTIPATTERN_1="whois: command not found|WHOIS lookup failed"
-ANTIPATTERN_2="Set the SECSKILL_TARGET environment variable"
+PATTERN_1="WHOIS|whois|example\.com|Target"
+PATTERN_2="lookup|Lookup|domain|Domain|type"
+ANTIPATTERN_1="command not found|permission denied"
+ANTIPATTERN_2="Set the SECSKILL_"

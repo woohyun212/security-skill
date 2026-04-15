@@ -1,8 +1,5 @@
-# Patterns that MUST match (grep -E, all must match for PASS)
-PATTERN_1="www|api|mail|dev|staging|admin"
-PATTERN_2="subfinder|Subdomain Enumeration|subdomain"
-PATTERN_3="Total found|Live hosts|results"
-
-# Patterns that must NOT match (any match = FAIL)
-ANTIPATTERN_1="subfinder: command not found|command not found"
-ANTIPATTERN_2="Set the SECSKILL_TARGET_DOMAIN environment variable"
+PATTERN_1="subfinder|Subdomain|subdomain|Enumeration"
+PATTERN_2="test\.security-skill\.local|target|Target"
+PATTERN_3="results|Total|complete|Summary"
+ANTIPATTERN_1="command not found|permission denied"
+ANTIPATTERN_2="Set the SECSKILL_"

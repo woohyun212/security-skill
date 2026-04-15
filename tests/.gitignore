@@ -1,0 +1,4 @@
+# Test output artifacts
+reports/
+!reports/.gitkeep
+/fixtures/git-repo/.git/

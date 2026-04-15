@@ -30,20 +30,11 @@ services:
     volumes:
       - ./dns-zone:/etc/bind
 
-  git-repo:
-    build: ./git-repo
-    volumes:
-      - git-repo-data:/repo
-
   mock-api:
     build: ./mock-api
     ports: ["8083:3000"]
 
-  log-source:
-    build: ./log-source
-    volumes:
-      - log-data:/logs
-
-volumes:
-  git-repo-data:
-  log-data:
+# git-repo and log-source removed — use tests/fixtures/ on host instead:
+#   tests/fixtures/git-repo/   — vulnerable git repo with secrets
+#   tests/fixtures/logs/       — sample security logs
+#   tests/fixtures/samples/    — test malware samples (EICAR)

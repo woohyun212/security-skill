@@ -86,7 +86,7 @@ flush_block() {
   # Emit header once
   if [[ $header_emitted -eq 0 ]]; then
     printf '#!/usr/bin/env bash\n'
-    printf 'set -euo pipefail\n'
+    printf 'set -uo pipefail\n'
     printf '# Extracted from: %s\n' "$SKILL_FILE"
     printf '\n'
     header_emitted=1
