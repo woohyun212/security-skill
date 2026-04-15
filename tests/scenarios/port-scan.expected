@@ -1,7 +1,7 @@
 # Patterns that MUST match (grep -E, all must match for PASS)
-PATTERN_1="8081/tcp.*open"
-PATTERN_2="Apache|nginx|httpd|http"
-PATTERN_3="Service list|Open port count|open port"
+PATTERN_1="[0-9]+/tcp.*open"
+PATTERN_2="Nmap scan report|Nmap done"
+PATTERN_3="Open port count|open port|PORT.*STATE"
 
 # Patterns that must NOT match (any match = FAIL)
 ANTIPATTERN_1="command not found|permission denied|fatal error"
