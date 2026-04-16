@@ -1,0 +1,3 @@
+Create a threat model for a REST API payment processing service that handles credit card data. Use STRIDE methodology. Identify at least 5 threats with severity ratings.
+TOOL_PATTERN=STRIDE|threat|asset|trust.boundary
+DONE_PATTERN=Spoofing|Tampering|Repudiation|Information Disclosure|Denial of Service|Elevation

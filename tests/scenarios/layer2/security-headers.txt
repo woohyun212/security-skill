@@ -1,0 +1,3 @@
+Analyze the HTTP security headers of http://localhost:8082. Check for missing CSP, X-Frame-Options, X-Content-Type-Options, HSTS, and other security headers.
+TOOL_PATTERN=curl|header|Header
+DONE_PATTERN=Content-Security-Policy|X-Frame-Options|missing|MISSING|recommend

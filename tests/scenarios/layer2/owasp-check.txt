@@ -1,0 +1,3 @@
+Perform an OWASP Top 10 2021 assessment for a web application running at http://localhost:3000 (Juice Shop). Check at least the top 3 categories.
+TOOL_PATTERN=OWASP|A01|A02|A03|injection|broken.*access
+DONE_PATTERN=A01|A02|A03|Injection|Broken Access|Cryptographic

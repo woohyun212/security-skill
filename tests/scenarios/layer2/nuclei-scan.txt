@@ -1,0 +1,3 @@
+Run a nuclei vulnerability scan against http://localhost:8081 with info,low,medium,high severity templates. Report any findings.
+TOOL_PATTERN=nuclei|template|severity
+DONE_PATTERN=finding|info|low|medium|vulnerability|scan complete

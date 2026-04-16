@@ -1,0 +1,9 @@
+Extract IOCs from the following log entries:
+
+Apr 10 12:00:01 host kernel: iptables DROP IN=eth0 SRC=185.220.101.1 DST=10.0.0.1
+Apr 10 12:00:10 host cron[999]: (root) CMD (curl -s http://malicious.example.com/beacon)
+Apr 10 12:00:20 host sudo[5678]: user1 : TTY=pts/0 ; PWD=/tmp ; USER=root ; COMMAND=/bin/bash
+
+List all IP addresses, domains, and URLs found.
+TOOL_PATTERN=grep|regex|extract|IOC|ioc
+DONE_PATTERN=185\.220\.101\.1|malicious\.example\.com|IOC|indicator

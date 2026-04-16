@@ -1,0 +1,3 @@
+Scan the directory at /mnt/data6/w00/security-skill/tests/fixtures/git-repo for insecure defaults. Check for hardcoded credentials, weak crypto algorithms, debug mode settings, and fail-open patterns.
+TOOL_PATTERN=grep|password|credential|MD5|SHA1|default
+DONE_PATTERN=password|admin123|AKIA|hardcoded|insecure|weak

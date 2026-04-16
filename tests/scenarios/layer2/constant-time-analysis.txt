@@ -1,0 +1,13 @@
+Review the following Python code for timing side-channel vulnerabilities:
+
+def verify_token(user_token, stored_token):
+    if len(user_token) != len(stored_token):
+        return False
+    for a, b in zip(user_token, stored_token):
+        if a != b:
+            return False
+    return True
+
+Explain the vulnerability and provide a secure alternative.
+TOOL_PATTERN=timing|constant.time|side.channel|hmac
+DONE_PATTERN=timing|early return|constant.time|hmac\.compare_digest|secrets\.compare_digest

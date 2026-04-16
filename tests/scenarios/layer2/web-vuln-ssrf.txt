@@ -1,0 +1,3 @@
+Test http://localhost:5000 for SSRF vulnerabilities. Try accessing internal resources like http://127.0.0.1:8081 through the name parameter.
+TOOL_PATTERN=curl|ssrf|SSRF|127\.0\.0\.1|internal
+DONE_PATTERN=SSRF|response|internal|access|server-side

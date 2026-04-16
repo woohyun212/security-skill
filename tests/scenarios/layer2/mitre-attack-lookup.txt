@@ -1,0 +1,3 @@
+Look up MITRE ATT&CK technique T1059 (Command and Scripting Interpreter). Provide sub-techniques, associated groups, and recommended mitigations.
+TOOL_PATTERN=mitre|ATT.CK|T1059|technique|mitrize
+DONE_PATTERN=T1059|Command.*Script|execution|sub-technique|mitigation

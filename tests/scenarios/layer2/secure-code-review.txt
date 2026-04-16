@@ -1,0 +1,23 @@
+Perform a security code review on this Python file:
+
+```python
+import sqlite3
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route('/login', methods=['POST'])
+def login():
+    username = request.form['username']
+    password = request.form['password']
+    conn = sqlite3.connect('users.db')
+    cursor = conn.execute(f"SELECT * FROM users WHERE name='{username}' AND pass='{password}'")
+    user = cursor.fetchone()
+    if user:
+        return f"Welcome {username}!"
+    return "Invalid credentials", 401
+```
+
+Identify all security vulnerabilities with CWE references.
+TOOL_PATTERN=SQL.*injection|XSS|CWE|vulnerability
+DONE_PATTERN=CWE-89|SQL.*injection|f-string|parameterized|sanitize
